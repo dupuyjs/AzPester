@@ -34,8 +34,39 @@ This framework cannot be packaged as a standalone Powershell module as *.Tests.p
 
 ## Usage
 
+### Declare a definition file
+
+Update `subscriptionId` and `resourceGroupName` with appropriate values.
+
+```json
+{
+    "$schema": "../../Source/Schemas/2021-04/schema.definition.json",
+    "contentVersion": "1.0.0.0",
+    "contexts": {
+        "default": {
+            "subscriptionId": "__SUBSCRIPTION_ID__",
+            "resourceGroupName": "__RESOURCE_GROUP_NAME__"
+        }
+    },
+    "definition": {
+        "network": {
+            "virtualNetworks": [
+                {
+                    "name": "vnet-hub",
+                    "location": "northeurope"
+                }
+            ]
+        }
+    }
+}
+```
+
+### Invoke AzPester using the definition file
+
 ```powershell
 PS C:\AzPester> Import-Module .\Source\AzPester.psm1
 PS C:\AzPester> Connect-AzAccount 
-PS C:\AzPester> Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json
+PS C:\AzPester> Invoke-AzPester -Definition definition.json
 ```
+
+![Output Screen Capture](./Docs/Images/output-101.png)
