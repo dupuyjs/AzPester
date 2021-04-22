@@ -3,8 +3,7 @@ function Invoke-AzPester {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Definition,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter(Mandatory = $false)]
         [String] $Parameters
     )
 
@@ -32,27 +31,28 @@ function Assert-Schemas {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Definition,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter(Mandatory = $false)]
         [String] $Parameters
     )
-
-    $parametersJson = Get-Content $Parameters -Raw
-    $definitionJson = Get-Content $Definition -Raw
 
     $parametersSchema = "$PSScriptRoot/Schemas/2021-04/schema.definition.parameters.json"
     $definitionSchema = "$PSScriptRoot/Schemas/2021-04/schema.definition.json"
 
-    $isValidParametersSchema = Test-Json -Json $parametersJson -SchemaFile $parametersSchema
-    if (!$isValidParametersSchema) {
-        Write-Host "Validation Failed: Please check parameters file, schema is invalid." -ForegroundColor Red
-        return $false
-    }
-
+    $definitionJson = Get-Content $Definition -Raw
     $isValidDefinitionSchema = Test-Json -Json $definitionJson -SchemaFile $definitionSchema
     if (!$isValidDefinitionSchema) {
         Write-Host "Validation Failed: Please check definition file, schema is invalid." -ForegroundColor Red
         return $false
+    }
+
+    # Parameters file is optional
+    if ($Parameters) {
+        $parametersJson = Get-Content $Parameters -Raw
+        $isValidParametersSchema = Test-Json -Json $parametersJson -SchemaFile $parametersSchema
+        if (!$isValidParametersSchema) {
+            Write-Host "Validation Failed: Please check parameters file, schema is invalid." -ForegroundColor Red
+            return $false
+        }
     }
 
     return $true
@@ -63,24 +63,34 @@ function Assert-Parameters {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Definition,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter(Mandatory = $false)]
         [String] $Parameters
     )
 
-    $parametersJson = Get-Content $Parameters -Raw
     $definitionJson = Get-Content $Definition -Raw
-
-    $sourceParameters = ($parametersJson | ConvertFrom-Json -AsHashtable).parameters
     $targetParameters = ($definitionJson | ConvertFrom-Json -AsHashtable).parameters
-    
-    foreach ($parameter in $targetParameters.GetEnumerator()) {
-        if (!$sourceParameters.ContainsKey($parameter.key) -and (!$parameter.value.defaultValue)) {
-            Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
-            return $false
+
+    # Parameters file is optional
+    if ($Parameters) {
+        $parametersJson = Get-Content $Parameters -Raw
+        $sourceParameters = ($parametersJson | ConvertFrom-Json -AsHashtable).parameters
+
+        foreach ($parameter in $targetParameters.GetEnumerator()) {
+            if (!$sourceParameters.ContainsKey($parameter.key) -and (!$parameter.value.defaultValue)) {
+                Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
+                return $false
+            }
         }
     }
-
+    else {
+        foreach ($parameter in $targetParameters.GetEnumerator()) {
+            if (!$parameter.value.defaultValue) {
+                Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
+                return $false
+            }
+        }
+    }
+    
     return $true
 }
 
@@ -89,17 +99,21 @@ function Set-Parameters {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Definition,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
+        [Parameter(Mandatory = $false)]
         [String] $Parameters
     )
 
-    $parametersJson = Get-Content $Parameters -Raw
     $definitionJson = Get-Content $Definition -Raw
-
-    $sourceParameters = ($parametersJson | ConvertFrom-Json -AsHashtable).parameters
     $targetParameters = ($definitionJson | ConvertFrom-Json -AsHashtable).parameters
-
+    
+    # Parameters file is optional
+    $parametersJson = $null
+    $sourceParameters = $null
+    if ($Parameters) {
+        $parametersJson = Get-Content $Parameters -Raw
+        $sourceParameters = ($parametersJson | ConvertFrom-Json -AsHashtable).parameters
+    }
+    
     # Regular expression used to get all expression placeholders
     $results = $definitionJson | Select-String '\{parameters.[a-zA-Z0-9_.-]+}' -AllMatches
 
@@ -118,14 +132,23 @@ function Set-Parameters {
         $expression = $null
 
         # Get the parameter value or default value
-        if ($sourceParameters[$name].value) {
-            $expression = '$sourceParameters.' + $split[1] + '.value'
-        }
-        elseif ($targetParameters[$name].defaultValue) {
+        if ($targetParameters[$name].defaultValue) {
             $expression = '$targetParameters.' + $split[1] + '.defaultValue'
         }
+        # Parameters file is optional
+        elseif ($sourceParameters) { 
+            Write-Host Parameters
+            if ($sourceParameters[$name].value) {
+                $expression = '$sourceParameters.' + $split[1] + '.value'
+            }
+            else {
+                Write-Host "Warning: Cannot evaluate placeholder expression $key. This parameter name seems invalid." -ForegroundColor Yellow
+                continue
+            }
+        }
         else {
-            Write-Host "Warning: Cannot evaluate placeholder expression $key." -ForegroundColor Yellow
+            Write-Host No Parameters
+            Write-Host "Warning: Cannot evaluate placeholder expression $key. This parameter name seems invalid." -ForegroundColor Yellow
             continue
         }
 
