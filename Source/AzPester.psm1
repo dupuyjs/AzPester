@@ -75,18 +75,22 @@ function Assert-Parameters {
         $parametersJson = Get-Content $Parameters -Raw
         $sourceParameters = ($parametersJson | ConvertFrom-Json -AsHashtable).parameters
 
-        foreach ($parameter in $targetParameters.GetEnumerator()) {
-            if (!$sourceParameters.ContainsKey($parameter.key) -and (!$parameter.value.defaultValue)) {
-                Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
-                return $false
+        if ($targetParameters) {
+            foreach ($parameter in $targetParameters.GetEnumerator()) {
+                if (!$sourceParameters.ContainsKey($parameter.key) -and (!$parameter.value.defaultValue)) {
+                    Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
+                    return $false
+                }
             }
         }
     }
     else {
-        foreach ($parameter in $targetParameters.GetEnumerator()) {
-            if (!$parameter.value.defaultValue) {
-                Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
-                return $false
+        if ($targetParameters) {
+            foreach ($parameter in $targetParameters.GetEnumerator()) {
+                if (!$parameter.value.defaultValue) {
+                    Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
+                    return $false
+                }
             }
         }
     }
@@ -107,8 +111,6 @@ function Set-Parameters {
     $targetParameters = ($definitionJson | ConvertFrom-Json -AsHashtable).parameters
     
     # Parameters file is optional
-    $parametersJson = $null
-    $sourceParameters = $null
     if ($Parameters) {
         $parametersJson = Get-Content $Parameters -Raw
         $sourceParameters = ($parametersJson | ConvertFrom-Json -AsHashtable).parameters
@@ -129,25 +131,15 @@ function Set-Parameters {
         $trim = $key.Trim('{', '}')
         $split = $trim.Split('.')
         $name = $split[1]
-        $expression = $null
 
         # Get the parameter value or default value
-        if ($targetParameters[$name].defaultValue) {
+        if (${targetParameters}?[$name].defaultValue) {
             $expression = '$targetParameters.' + $split[1] + '.defaultValue'
         }
-        # Parameters file is optional
-        elseif ($sourceParameters) { 
-            Write-Host Parameters
-            if ($sourceParameters[$name].value) {
-                $expression = '$sourceParameters.' + $split[1] + '.value'
-            }
-            else {
-                Write-Host "Warning: Cannot evaluate placeholder expression $key. This parameter name seems invalid." -ForegroundColor Yellow
-                continue
-            }
+        elseif (${sourceParameters}?[$name].value) {   
+            $expression = '$sourceParameters.' + $split[1] + '.value'
         }
         else {
-            Write-Host No Parameters
             Write-Host "Warning: Cannot evaluate placeholder expression $key. This parameter name seems invalid." -ForegroundColor Yellow
             continue
         }
