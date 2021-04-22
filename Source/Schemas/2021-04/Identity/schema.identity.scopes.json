@@ -1,0 +1,22 @@
+{
+    "id": "schema.identity.scopes",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Scopes",
+    "description": "Schema for Scopes Section",
+    "definitions": {
+        "scope": {
+            "type": "object",
+            "properties": {
+                "displayName": {
+                    "type": "string",
+                    "description": "The identity name."
+                },
+                "scope": {
+                    "type": "string",
+                    "description": "The scope reference of the role assignment. In the format of relative URI."
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

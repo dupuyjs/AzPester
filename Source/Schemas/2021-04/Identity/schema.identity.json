@@ -1,0 +1,26 @@
+{
+    "id": "schema.identity",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Identity",
+    "description": "Schema for Identity Section",
+    "definitions": {
+        "identity": {
+            "type": "object",
+            "properties": {
+                "identities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "schema.identity.identities.json#/definitions/identity"
+                    }
+                },
+                "scopes": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "schema.identity.scopes.json#/definitions/scope"
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

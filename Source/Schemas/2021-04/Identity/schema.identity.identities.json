@@ -1,0 +1,56 @@
+{
+    "id": "schema.identity.identities",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Identities",
+    "description": "Schema for Identities Section",
+    "definitions": {
+        "identity": {
+            "type": "object",
+            "required": [
+                "name",
+                "type"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The identity name."
+                },
+                "type": {
+                    "type": "string",
+                    "description": "The identity type.",
+                    "enum": [
+                        "ManagedIdentity",
+                        "ServicePrincipal",
+                        "Group"
+                    ]
+                },
+                "roleAssignments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/roleAssignment"
+                    },
+                    "description": "List of role assignments."
+                }
+            },
+            "additionalProperties": false
+        },
+        "roleAssignment": {
+            "type": "object",
+            "required": [
+                "scopeRef",
+                "role"
+            ],
+            "properties": {
+                "scopeRef": {
+                    "type": "string",
+                    "description": "The scope reference of the role assignment."
+                },
+                "role": {
+                    "type": "string",
+                    "description": "The name of the RBAC role that needs to be assigned to the identity."
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

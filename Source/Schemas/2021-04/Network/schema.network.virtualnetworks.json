@@ -1,0 +1,92 @@
+{
+    "id": "schema.network.virtualnetworks",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Virtual Network",
+    "description": "Schema for Virtual Network Section",
+    "definitions": {
+        "virtualnetwork": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the virtual network."
+                },
+                "location": {
+                    "type": "string",
+                    "description": "The location/region where the virtual network has been created."
+                },
+                "addressSpace": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/addressPrefix"
+                    },
+                    "description": "The address space that is used for the virtual network. List of address prefixes."
+                },
+                "subnets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/subnet"
+                    },
+                    "description": "List of subnets created within the virtual network."
+                },
+                "virtualNetworkPeerings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/virtualNetworkPeering"
+                    },
+                    "description": "List of peerings which targets remote virtual network."
+                }
+            },
+            "additionalProperties": false
+        },
+        "addressPrefix": {
+            "type": "object",
+            "properties": {
+                "addressPrefix": {
+                    "type": "string",
+                    "description": "The address prefix to use for the address space."
+                }
+            },
+            "additionalProperties": false
+        },
+        "subnet": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the subnet."
+                },
+                "addressPrefix": {
+                    "type": "string",
+                    "description": "The address prefix to use for the subnet."
+                }
+            },
+            "additionalProperties": false
+        },
+        "virtualNetworkPeering": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The virtual network peering name."
+                },
+                "remoteVirtualNetwork": {
+                    "type": "object",
+                    "$ref": "#/definitions/remoteVirtualNetwork",
+                    "description": "The remote virtual network."
+                }
+            },
+            "additionalProperties": false
+        },
+        "remoteVirtualNetwork": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The remote virtual network name."
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

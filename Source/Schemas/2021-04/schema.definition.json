@@ -1,0 +1,122 @@
+{
+    "id": "schema.definition",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Definition",
+    "description": "Schema for Definition File",
+    "type": "object",
+    "required": [
+        "$schema",
+        "contentVersion",
+        "contexts",
+        "definition"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string"
+        },
+        "contentVersion": {
+            "type": "string",
+            "pattern": "(^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$)",
+            "description": "A 4 number format for the version number of this parameter file. For example, 1.0.0.0"
+        },
+        "parameters": {
+            "type": "object",
+            "description": "Input parameter definitions",
+            "additionalProperties": {
+                "$ref": "#/definitions/parameter"
+            }
+        },
+        "contexts": {
+            "type": "object",
+            "properties": {
+                "default": {
+                    "$ref": "#/definitions/context",
+                    "required": [
+                        "subscriptionId",
+                        "resourceGroupName"
+                    ]
+                }
+            },
+            "additionalProperties": {
+                "$ref": "#/definitions/context",
+                "required": [
+                    "subscriptionId"
+                ]
+            },
+            "required": [
+                "default"
+            ]
+        },
+        "definition": {
+            "type": "object",
+            "properties": {
+                "network": {
+                    "$ref": "./Network/schema.network.json#/definitions/network"
+                },
+                "identity": {
+                    "$ref": "./Identity/schema.identity.json#/definitions/identity"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "definitions": {
+        "parameter": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "$ref": "#/definitions/parameterTypes",
+                    "description": "Type of input parameter"
+                },
+                "defaultValue": {
+                    "$ref": "#/definitions/parameterValueTypes",
+                    "description": "Default value to be used if one is not provided"
+                },
+                "metadata": {
+                    "type": "object",
+                    "description": "Metadata for the parameter, can be any valid json object"
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "additionalProperties": false
+        },
+        "parameterTypes": {
+            "enum": [
+                "string",
+                "securestring",
+                "int",
+                "bool",
+                "object",
+                "secureObject",
+                "array"
+            ]
+        },
+        "parameterValueTypes": {
+            "type": [
+                "string",
+                "boolean",
+                "integer",
+                "number",
+                "object",
+                "array",
+                "null"
+            ]
+        },
+        "context": {
+            "type": "object",
+            "properties": {
+                "subscriptionId": {
+                    "type": "string",
+                    "description": "Subscription Identifier"
+                },
+                "resourceGroupName": {
+                    "type": "string",
+                    "description": "Resource Group Name"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

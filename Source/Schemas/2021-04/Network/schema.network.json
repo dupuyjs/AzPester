@@ -1,0 +1,20 @@
+{
+    "id": "schema.network",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Network",
+    "description": "Schema for Network Section",
+    "definitions": {
+        "network": {
+            "type": "object",
+            "properties": {
+                "virtualNetworks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "schema.network.virtualnetworks.json#/definitions/virtualnetwork"
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}
