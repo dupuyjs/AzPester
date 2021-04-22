@@ -28,7 +28,7 @@ Describe 'Virtual Network Acceptance Tests' {
         It 'Validate virtual network location is <location>' -Skip:(!$location) {
             $VirtualNetwork.Location | Should -Be $location  
         }
-        It 'Validate virtual network contains <addressPrefix> address prefix' -ForEach $addressPrefixes {
+        It 'Validate virtual network contains <addressPrefix> address prefix' -ForEach $addressSpace {
             $virtualNetwork.AddressSpace.AddressPrefixes | Should -Contain $addressPrefix
         }
         It 'Validate virtual network contains <name> subnet' -ForEach $subnets {
