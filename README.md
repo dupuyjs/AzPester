@@ -120,7 +120,7 @@ These parameters can then be used in the definition file using the syntax `{para
 }
 ```
 
-In addition, you can dissociate parameters values (at least the ones with no default values) into a separate files.
+In addition, you can dissociate parameters values (at least the ones with no default values) into a separate file.
 
 ```json
 {
