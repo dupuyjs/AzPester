@@ -140,3 +140,48 @@ In addition, you can dissociate parameters values (at least the ones with no def
 ```powershell
 PS C:\AzPester> Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json
 ```
+
+## Contexts
+
+This section will define the default subscription and resource group targeted for tests. By the way, `default` property is required, and json schema validation will fail if you don't provide it.
+
+```json
+"contexts": {
+    "default": {
+        "subscriptionId": "{parameters.subscriptionId}",
+        "resourceGroupName": "{parameters.resourceGroupName}"
+    }
+}
+```
+
+This section has another purpose. Some resources need to switch to a different subscription context to make appropriate call to Azure. This process of context switching is unfortunately time consuming.
+
+So, to avoid performance loss, we are loading all contexts just once before invoking tests. These contexts are passed to all Pester tests and reused as needed when a context switch is detected.
+
+So if you target a specific subscription (as required in the documentation of the associated resource), you need to reference the associated `subscriptionId` as declared below:
+
+```json
+"contexts": {
+    "default": {
+        "subscriptionId": "{parameters.subscriptionId}",
+        "resourceGroupName": "{parameters.resourceGroupName}"
+    },
+    "dns": {
+        "subscriptionId": "{parameters.dnsSubscriptionId}",
+    }
+}
+```
+
+Additional contexts don't need to reference a `resourceGroupName`.
+
+## Resources
+
+Please find below documentation of resources currently supported.
+
+### Identity Documentation
+
+[Identies and Scopes definition](Docs/Resources/Identity.md)
+
+### Network Documentation
+
+Virtual Networks definition
