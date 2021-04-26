@@ -6,18 +6,23 @@
     "definitions": {
         "identity": {
             "type": "object",
+            "required": [
+                "identities"
+            ],
             "properties": {
                 "identities": {
                     "type": "array",
                     "items": {
                         "$ref": "schema.identity.identities.json#/definitions/identity"
-                    }
+                    },
+                    "description": "(Required) An array of `identity` objects."
                 },
                 "scopes": {
                     "type": "object",
                     "additionalProperties": {
                         "$ref": "schema.identity.scopes.json#/definitions/scope"
-                    }
+                    },
+                    "description": "(Optional) Scope properties definition. Each property must implement a `scope` object."
                 }
             },
             "additionalProperties": false

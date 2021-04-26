@@ -6,14 +6,18 @@
     "definitions": {
         "scope": {
             "type": "object",
+            "required": [
+                "displayName",
+                "scope"
+            ],
             "properties": {
                 "displayName": {
                     "type": "string",
-                    "description": "The identity name."
+                    "description": "(Required) The scope name. Used only for display in test results."
                 },
                 "scope": {
                     "type": "string",
-                    "description": "The scope reference of the role assignment. In the format of relative URI."
+                    "description": "(Required) The scope definition of the role assignment. In the format of relative URI."
                 }
             },
             "additionalProperties": false

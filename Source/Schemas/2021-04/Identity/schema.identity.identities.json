@@ -13,11 +13,11 @@
             "properties": {
                 "name": {
                     "type": "string",
-                    "description": "The identity name."
+                    "description": "(Required) The identity name."
                 },
                 "type": {
                     "type": "string",
-                    "description": "The identity type.",
+                    "description": "(Required) The identity type.",
                     "enum": [
                         "ManagedIdentity",
                         "ServicePrincipal",
@@ -29,7 +29,7 @@
                     "items": {
                         "$ref": "#/definitions/roleAssignment"
                     },
-                    "description": "List of role assignments."
+                    "description": "(Optional) An array of `roleAssignment` objects."
                 }
             },
             "additionalProperties": false
@@ -43,11 +43,11 @@
             "properties": {
                 "scopeRef": {
                     "type": "string",
-                    "description": "The scope reference of the role assignment."
+                    "description": "(Required) The scope reference of the role assignment. Should target a scope you defined in the scopes section."
                 },
                 "role": {
                     "type": "string",
-                    "description": "The name of the RBAC role that needs to be assigned to the identity."
+                    "description": "(Required) The name of the RBAC role that needs to be assigned to the identity."
                 }
             },
             "additionalProperties": false
