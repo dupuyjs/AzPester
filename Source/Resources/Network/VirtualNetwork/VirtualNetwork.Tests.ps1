@@ -21,12 +21,13 @@ Describe 'Virtual Network Acceptance Tests' {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
             $virtualNetwork = Get-VirtualNetwork -Definition $Definition -Contexts $Contexts -Name $name
         }
+
         It 'Validate virtual network <name> has been provisioned' {
             $virtualNetwork | Should -Not -BeNullOrEmpty
-            $VirtualNetwork.ProvisioningState | Should -Be "Succeeded"   
+            $VirtualNetwork.ProvisioningState | Should -Be "Succeeded"
         }
-        It 'Validate virtual network location is <location>' -Skip:(!$location) {
-            $VirtualNetwork.Location | Should -Be $location  
+        It 'Validate virtual network <name> property is <value>' -ForEach $properties {
+            $VirtualNetwork.$name | Should -Be $value
         }
         It 'Validate virtual network contains <addressPrefix> address prefix' -ForEach $addressSpace {
             $virtualNetwork.AddressSpace.AddressPrefixes | Should -Contain $addressPrefix
