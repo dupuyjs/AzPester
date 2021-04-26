@@ -61,8 +61,10 @@ Note: If there is no role assignments, we are just evaluating if the identity ex
 
 Note: In scope property, you can target a subsription different than default one. We will automatically detect the subscription and switch to the appropriate context.
 
-Anyway, you have to reference this subscription identifier in the `contexts` section. For more details about contexts, please read the [REAME.md](../../README.md) file. If not, the following warning will be displayed:
+Anyway, you have to reference this subscription identifier in the `contexts` section. If not, the following warning will be displayed:
 
 ```powershell
 "Warning: Subscription $scopeSubscriptionId is unknown. This subscription should be referenced in contexts."
 ```
+
+For more details about contexts, please read the [REAME.md](../../../README.md) file.

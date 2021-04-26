@@ -180,8 +180,12 @@ Please find below documentation of resources currently supported.
 
 ### Identity Documentation
 
-[Identies and Scopes definition](Docs/Resources/Identity.md)
+[Identies and Scopes definition](Docs/Resources/Identity/Identity.md)
+
+These resources will validate if service principals, managed identies and groups are correctly provisioned. In addition, you can also check role assignments associated to these identities.
 
 ### Network Documentation
 
-Virtual Networks definition
+[Virtual Networks definition](Docs/Resources/Network/VirtualNetwork.md)
+
+These resources will validate if virtual networks are correctly provisioned with associated properties (ex. subnets, peerings).
