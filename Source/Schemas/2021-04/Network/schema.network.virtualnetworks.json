@@ -12,36 +12,36 @@
             "properties": {
                 "name": {
                     "type": "string",
-                    "description": "The name of the virtual network."
+                    "description": "(Required) The name of the virtual network."
                 },
                 "location": {
                     "type": "string",
-                    "description": "The location/region where the virtual network has been created."
+                    "description": "(Optional) The location/region where the virtual network has been created."
                 },
                 "enableDdosProtection": {
                     "type": "boolean",
-                    "description": "Specifies if DDoS protection is enabled for all the protected resources in the virtual network."
+                    "description": "(Optional) Specifies if DDoS protection is enabled for all the protected resources in the virtual network."
                 },
                 "addressSpace": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/addressPrefix"
                     },
-                    "description": "The address space that is used for the virtual network. Contains an array of addressPrefix objects that can be used by subnets."
+                    "description": "(Optional) The address space that is used for the virtual network. Contains an array of `addressPrefix` objects that can be used by subnets."
                 },
                 "subnets": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/subnet"
                     },
-                    "description": "An array of subnet objects defined in the virtual network."
+                    "description": "(Optional) An array of `subnet` objects defined in the virtual network."
                 },
                 "virtualNetworkPeerings": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/virtualNetworkPeering"
                     },
-                    "description": "An array of peerings objects which targets remote virtual networks."
+                    "description": "(Optional) An array of `virtualNetworkPeering` objects which targets remote virtual networks."
                 }
             },
             "additionalProperties": false
@@ -54,7 +54,7 @@
             "properties": {
                 "addressPrefix": {
                     "type": "string",
-                    "description": "The address prefix to use for the address space."
+                    "description": "(Required) The address prefix to use for the address space."
                 }
             },
             "additionalProperties": false
@@ -67,21 +67,21 @@
             "properties": {
                 "name": {
                     "type": "string",
-                    "description": "The name of the subnet."
+                    "description": "(Required) The name of the subnet."
                 },
                 "addressPrefix": {
                     "type": "string",
-                    "description": "The address prefix to use for the subnet."
+                    "description": "(Optional) The address prefix to use for the subnet."
                 },
                 "networkSecurityGroup": {
                     "type": "object",
                     "$ref": "#/definitions/networkSecurityGroup",
-                    "description": "A networkSecurityGroup object."
+                    "description": "(Optional) A `networkSecurityGroup` object."
                 },
                 "routeTable": {
                     "type": "object",
                     "$ref": "#/definitions/routeTable",
-                    "description": "A routeTable object."
+                    "description": "(Optional) A `routeTable` object."
                 }
             },
             "additionalProperties": false
@@ -95,12 +95,12 @@
             "properties": {
                 "name": {
                     "type": "string",
-                    "description": "The virtual network peering name."
+                    "description": "(Required) The virtual network peering name."
                 },
                 "remoteVirtualNetwork": {
                     "type": "object",
                     "$ref": "#/definitions/remoteVirtualNetwork",
-                    "description": "The remote virtual network."
+                    "description": "(Required) A `remoteVirtualNetwork` object."
                 }
             },
             "additionalProperties": false
@@ -113,15 +113,15 @@
             "properties": {
                 "name": {
                     "type": "string",
-                    "description": "The remote virtual network name."
+                    "description": "(Required) The remote virtual network name."
                 },
                 "subscriptionId": {
                     "type": "string",
-                    "description": "The subscription identifier where is located the remote virtual network."
+                    "description": "(Optional) The subscription identifier where is located the remote virtual network."
                 },
                 "resourceGroupName": {
                     "type": "string",
-                    "description": "The resource group name where is located the remote virtual network."
+                    "description": "(Optional) The resource group name where is located the remote virtual network."
                 }
             },
             "additionalProperties": false
@@ -134,15 +134,15 @@
             "properties": {
                 "name": {
                     "type": "string",
-                    "description": "The network security group name."
+                    "description": "(Required) The network security group name."
                 },
                 "subscriptionId": {
                     "type": "string",
-                    "description": "The subscription identifier where is located the network security group."
+                    "description": "(Optional) The subscription identifier where is located the network security group."
                 },
                 "resourceGroupName": {
                     "type": "string",
-                    "description": "The resource group name where is located the network security group."
+                    "description": "(Optional) The resource group name where is located the network security group."
                 }
             },
             "additionalProperties": false
@@ -155,15 +155,15 @@
             "properties": {
                 "name": {
                     "type": "string",
-                    "description": "The route table name."
+                    "description": "(Required) The route table name."
                 },
                 "subscriptionId": {
                     "type": "string",
-                    "description": "The subscription identifier where is located the route table."
+                    "description": "(Optional) The subscription identifier where is located the route table."
                 },
                 "resourceGroupName": {
                     "type": "string",
-                    "description": "The resource group name where is located the route table."
+                    "description": "(Optional) The resource group name where is located the route table."
                 }
             },
             "additionalProperties": false
