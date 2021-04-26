@@ -70,3 +70,73 @@ PS C:\AzPester> Invoke-AzPester -Definition definition.json
 ```
 
 ![Output Screen Capture](./Docs/Images/output-101.png)
+
+## Parameters
+
+You can declare an array of `parameter` objects in your definition file. `type` property is required, and `defaultValue` optional.
+
+These parameters can then be used in the definition file using the syntax `{parameters.<parameterName>}`. Complex object types are supported.
+
+```json
+{
+    "$schema": "../../Source/Schemas/2021-04/schema.definition.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "type": "string",
+            "defaultValue": "__SUBSCRIPTION_ID__"
+        },
+        "resourceGroupName": {
+            "type": "string",
+            "defaultValue": "__RESOURCE_GROUP_NAME__"
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "northeurope"
+        },
+        "hubNetwork": {
+            "type": "object",
+            "defaultValue": {
+                "name": "vnet-hub",
+            }
+        }
+    },
+    "contexts": {
+        "default": {
+            "subscriptionId": "{parameters.subscriptionId}",
+            "resourceGroupName": "{parameters.resourceGroupName}"
+        }
+    },
+    "definition": {
+        "network": {
+            "virtualNetworks": [
+                {
+                    "name": "{parameters.hubNetwork.name}",
+                    "location": "{parameters.location}"
+                }
+            ]
+        }
+    }
+}
+```
+
+In addition, you can dissociate parameters values (at least the ones with no default values) into a separate files.
+
+```json
+{
+    "$schema": "../../Source/Schemas/2021-04/schema.definition.parameters.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "value": "__SUBSCRIPTION_ID__"
+        },
+        "resourceGroupName": {
+            "value": "__RESOURCE_GROUP_NAME__"
+        }
+    }
+}
+```
+
+```powershell
+PS C:\AzPester> Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json
+```
