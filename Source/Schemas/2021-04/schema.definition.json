@@ -109,11 +109,11 @@
             "properties": {
                 "subscriptionId": {
                     "type": "string",
-                    "description": "Subscription Identifier"
+                    "description": "The subscription identifier."
                 },
                 "resourceGroupName": {
                     "type": "string",
-                    "description": "Resource Group Name"
+                    "description": "The resource group name."
                 }
             },
             "additionalProperties": false
