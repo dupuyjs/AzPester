@@ -26,7 +26,7 @@ Describe 'Virtual Network <name> Acceptance Tests' -ForEach $VirtualNetworks {
             $virtualNetwork | Should -Not -BeNullOrEmpty
             $VirtualNetwork.ProvisioningState | Should -Be "Succeeded"
         }
-        It 'Validate virtual network <propertyName> is <propertyValue>' -ForEach $properties {
+        It 'Validate virtual network <propertyName> is <displayValue>' -ForEach $properties {
             $VirtualNetwork.$propertyName | Should -Be $propertyValue
         }
         It 'Validate virtual network address space contains <addressPrefix>' -ForEach $addressSpace {
@@ -37,7 +37,11 @@ Describe 'Virtual Network <name> Acceptance Tests' -ForEach $VirtualNetworks {
         }
         It 'Validate virtual network peering with <remoteVirtualNetwork.name> is connected' -ForEach $virtualNetworkPeerings {
             $peering = $virtualNetwork.VirtualNetworkPeerings | Where-Object { $_.Name -eq $name }
-            $remoteVirtualNetwork = Get-VirtualNetwork -Definition $Definition -Contexts $Contexts -Name $remoteVirtualNetwork.name
+            $remoteVirtualNetwork = Get-VirtualNetwork -Definition $Definition `
+                                                       -Contexts $Contexts `
+                                                       -Name $remoteVirtualNetwork.name `
+                                                       -SubscriptionId $remoteVirtualNetwork.subscriptionId `
+                                                       -ResourceGroupName $remoteVirtualNetwork.resourceGroupName 
             
             $peering | Should -Not -BeNullOrEmpty
             $peering.RemoteVirtualNetwork.Id | Should -Be $remoteVirtualNetwork.Id
@@ -52,14 +56,24 @@ Describe 'Virtual Network <name> Acceptance Tests' -ForEach $VirtualNetworks {
             $Subnet = $virtualNetwork.Subnets | Where-Object {$_.Name -eq $name}
         }
 
-        It 'Validate subnet <propertyName> is <propertyValue>' -ForEach $properties {
+        It 'Validate subnet <propertyName> is <displayValue>' -ForEach $properties {
             if($propertyName -eq 'networkSecurityGroup') {
-                $nsg = Get-NetworkSecurityGroup -Definition $Definition -Contexts $Contexts -Name $propertyValue
+                $nsg = Get-NetworkSecurityGroup -Definition $Definition `
+                                                -Contexts $Contexts `
+                                                -Name $propertyValue.name `
+                                                -SubscriptionId $propertyValue.subscriptionId `
+                                                -ResourceGroupName $propertyValue.resourceGroupName
+
                 $nsg | Should -Not -BeNullOrEmpty
                 $Subnet.NetworkSecurityGroup.Id | Should -Be $nsg.Id
             }
             elseif($propertyName -eq 'routeTable') {
-                $routeTable = Get-RouteTable -Definition $Definition -Contexts $Contexts -Name $propertyValue
+                $routeTable = Get-RouteTable -Definition $Definition `
+                                             -Contexts $Contexts `
+                                             -Name $propertyValue.name `
+                                             -SubscriptionId $propertyValue.subscriptionId `
+                                             -ResourceGroupName $propertyValue.resourceGroupName
+                                             
                 $routeTable | Should -Not -BeNullOrEmpty
                 $Subnet.RouteTable.Id | Should -Be $routeTable.Id
             }

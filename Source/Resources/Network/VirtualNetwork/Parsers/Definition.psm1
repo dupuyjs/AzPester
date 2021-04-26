@@ -11,24 +11,24 @@ function Find-VirtualNetworks {
         $properties = @()
 
         if ($virtualNetwork.location) {
-            $properties += @{propertyName = 'location'; propertyValue = $virtualNetwork.location }
+            $properties += @{propertyName = 'location'; propertyValue = $virtualNetwork.location; displayValue = $virtualNetwork.location }
         }
         if ($null -ne $virtualNetwork.enableDdosProtection) {
-            $properties += @{propertyName = 'enableDdosProtection'; propertyValue = $virtualNetwork.enableDdosProtection }
+            $properties += @{propertyName = 'enableDdosProtection'; propertyValue = $virtualNetwork.enableDdosProtection; displayValue = $virtualNetwork.enableDdosProtection }
         }
 
         if ($virtualNetwork.subnets) {
             foreach ($subnet in $virtualNetwork.subnets) {
                 $subnetProperties = @()
 
-                if($subnet.addressPrefix) {
-                    $subnetProperties += @{propertyName = 'addressPrefix'; propertyValue = $subnet.addressPrefix }
+                if ($subnet.addressPrefix) {
+                    $subnetProperties += @{propertyName = 'addressPrefix'; propertyValue = $subnet.addressPrefix; displayValue = $subnet.addressPrefix }
                 }
-                if($subnet.networkSecurityGroup) {
-                    $subnetProperties += @{propertyName = 'networkSecurityGroup'; propertyValue = $subnet.networkSecurityGroup.name }
+                if ($subnet.networkSecurityGroup) {
+                    $subnetProperties += @{propertyName = 'networkSecurityGroup'; propertyValue = $subnet.networkSecurityGroup; displayValue = $subnet.networkSecurityGroup.name }
                 }
-                if($subnet.routeTable) {
-                    $subnetProperties += @{propertyName = 'routeTable'; propertyValue = $subnet.routeTable.name }
+                if ($subnet.routeTable) {
+                    $subnetProperties += @{propertyName = 'routeTable'; propertyValue = $subnet.routeTable; displayValue = $subnet.routeTable.name }
                 }
 
                 $subnet.properties = $subnetProperties

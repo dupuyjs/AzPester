@@ -135,6 +135,14 @@
                 "name": {
                     "type": "string",
                     "description": "The network security group name."
+                },
+                "subscriptionId": {
+                    "type": "string",
+                    "description": "The subscription identifier where is located the network security group."
+                },
+                "resourceGroupName": {
+                    "type": "string",
+                    "description": "The resource group name where is located the network security group."
                 }
             },
             "additionalProperties": false
@@ -148,6 +156,14 @@
                 "name": {
                     "type": "string",
                     "description": "The route table name."
+                },
+                "subscriptionId": {
+                    "type": "string",
+                    "description": "The subscription identifier where is located the route table."
+                },
+                "resourceGroupName": {
+                    "type": "string",
+                    "description": "The resource group name where is located the route table."
                 }
             },
             "additionalProperties": false
