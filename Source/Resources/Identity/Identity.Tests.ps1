@@ -25,6 +25,7 @@ Describe 'Identity Acceptance Tests' {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
             $identity = Get-AzADServicePrincipal -DisplayName $name
         }
+        
         It 'Validate <name> has been created' {
             $identity | Should -Not -BeNullOrEmpty
         }
@@ -38,6 +39,7 @@ Describe 'Identity Acceptance Tests' {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
             $identity = Get-UserAssignedIdentity -Definition $Definition -Name $name
         }
+
         It 'Validate <name> has been created' {
             $identity | Should -Not -BeNullOrEmpty
         }
@@ -51,6 +53,7 @@ Describe 'Identity Acceptance Tests' {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
             $identity = Get-AzADGroup -DisplayName $name
         }
+        
         It 'Validate <name> has been created' {
             $identity | Should -Not -BeNullOrEmpty
         }
