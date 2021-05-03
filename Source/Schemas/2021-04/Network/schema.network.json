@@ -10,7 +10,13 @@
                 "virtualNetworks": {
                     "type": "array",
                     "items": {
-                        "$ref": "schema.network.virtualnetworks.json#/definitions/virtualnetwork"
+                        "$ref": "schema.network.virtualnetworks.json#/definitions/virtualNetwork"
+                    }
+                },
+                "networkSecurityGroups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "schema.network.networksecuritygroups.json#/definitions/networkSecurityGroup"
                     }
                 }
             },

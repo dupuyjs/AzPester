@@ -1,0 +1,126 @@
+{
+    "id": "schema.network.networksecuritygroups",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Network Security Group",
+    "description": "Schema for Network Security Group Section",
+    "definitions": {
+        "networkSecurityGroup": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the network security group."
+                },
+                "location": {
+                    "type": "string",
+                    "description": "(Optional) The location/region where the network security group has been created."
+                },
+                "securityRules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/securityRule"
+                    }
+                }
+            }
+        },
+        "securityRule": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "protocol": {
+                    "type": "string",
+                    "description": "(Optional) The network protocol this rule applies to.",
+                    "enum": [
+                        "Tcp",
+                        "Udp",
+                        "Icmp",
+                        "Esp",
+                        "*",
+                        "Ah"
+                    ]
+                },
+                "sourcePortRange": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ],
+                    "description": "(Optional) The source port ranges. Integer or range between 0 and 65535. Asterisk '*' can also be used to match all ports."
+                },
+                "destinationPortRange": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ],
+                    "description": "(Optional) The destination port ranges. Integer or range between 0 and 65535. Asterisk '*' can also be used to match all ports."
+                },
+                "sourceAddressPrefix": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ],
+                    "description": "(Optional) The CIDR or source IP ranges. Asterisk '*' can also be used to match all source IPs. Default tags such as 'VirtualNetwork', 'AzureLoadBalancer' and 'Internet' can also be used. If this is an ingress rule, specifies where network traffic originates from."
+                },
+                "destinationAddressPrefix": {
+                    "oneOf": [
+                        {
+                            "type": "string"
+                        },
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    ],
+                    "description": "(Optional) The destination address prefixes. CIDR or destination IP range. Asterisk '*' can also be used to match all source IPs. Default tags such as 'VirtualNetwork', 'AzureLoadBalancer' and 'Internet' can also be used."
+                },
+                "access": {
+                    "type": "string",
+                    "description": "(Optional) Specifies whether network traffic is allowed or denied.",
+                    "enum": [
+                        "Allow",
+                        "Deny"
+                    ]
+                },
+                "priority": {
+                    "type": "integer",
+                    "description": "(Optional) The priority of the rule. The value can be between 100 and 4096. The priority number must be unique for each rule in the collection. The lower the priority number, the higher the priority of the rule."
+                },
+                "direction": {
+                    "type": "string",
+                    "description": "(Optional) Specifies whether a rule is evaluated on incoming or outgoing traffic.",
+                    "enum": [
+                        "Inbound",
+                        "Outbound"
+                    ]
+                }
+            }
+        }
+    }
+}
