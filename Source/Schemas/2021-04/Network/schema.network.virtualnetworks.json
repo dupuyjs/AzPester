@@ -4,7 +4,7 @@
     "title": "Virtual Network",
     "description": "Schema for Virtual Network Section",
     "definitions": {
-        "virtualnetwork": {
+        "virtualNetwork": {
             "type": "object",
             "required": [
                 "name"

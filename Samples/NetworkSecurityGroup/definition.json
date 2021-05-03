@@ -1,0 +1,136 @@
+{
+    "$schema": "../../Source/Schemas/2021-04/schema.definition.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        },
+        "spokeNetwork": {
+            "type": "object",
+            "defaultValue": {
+                "name": "vnet-spoke-one",
+                "subnetNsgName": "nsg-spoke-one-resources"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "northeurope"
+        }
+    },
+    "contexts": {
+        "default": {
+            "subscriptionId": "{parameters.subscriptionId}",
+            "resourceGroupName": "{parameters.resourceGroupName}"
+        }
+    },
+    "definition": {
+        "network": {
+            "networkSecurityGroups": [
+                {
+                    "name": "{parameters.spokeNetwork.subnetNsgName}",
+                    "location": "{parameters.location}",
+                    "securityRules": [
+                        {
+                            "name": "bastion-in-vnet",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": [
+                                "22",
+                                "3389"
+                            ],
+                            "sourceAddressPrefix": "10.0.1.0/29",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        },
+                        {
+                            "name": "DenyAllInBound",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": [
+                                "*"
+                            ],
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 1000,
+                            "direction": "Inbound"
+                        }
+                    ],
+                    "defaultSecurityRules": [
+                        {
+                            "name": "AllowVnetInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "VirtualNetwork",
+                            "access": "Allow",
+                            "priority": 65000,
+                            "direction": "Inbound"
+                        },
+                        {
+                            "name": "AllowAzureLoadBalancerInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "AzureLoadBalancer",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 65001,
+                            "direction": "Inbound"
+                        },
+                        {
+                            "name": "DenyAllInBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 65500,
+                            "direction": "Inbound"
+                        },
+                        {
+                            "name": "AllowVnetOutBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "VirtualNetwork",
+                            "destinationAddressPrefix": "VirtualNetwork",
+                            "access": "Allow",
+                            "priority": 65000,
+                            "direction": "Outbound"
+                        },
+                        {
+                            "name": "AllowInternetOutBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "Internet",
+                            "access": "Allow",
+                            "priority": 65001,
+                            "direction": "Outbound"
+                        },
+                        {
+                            "name": "DenyAllOutBound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 65500,
+                            "direction": "Outbound"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
