@@ -77,11 +77,25 @@
   - Type: networkSecurityGroup
 - `routeTable`: (Optional) A `routeTable` object.
   - Type: routeTable
-  
+- `privateEndpointNetworkPolicies`: (Optional) Enable or Disable apply network policies on private endpoint in the subnet.
+  - Type: string
+  - Valid values: `Enabled` or `Disabled`
+- `privateLinkServiceNetworkPolicies`: (Optional) Enable or Disable apply network policies on private link service in the subnet.
+  - Type: string
+  - Valid Values: `Enabled` or `Disabled`
+
 ### virtualNetworkPeering object
 
 - `name`: (Required) The virtual network peering name.
   - Type: string
+- `allowVirtualNetworkAccess`: (Optional) Whether the VMs in the local virtual network space would be able to access the VMs in remote virtual network space.
+  - Type: boolean
+- `allowForwardedTraffic`: (Optional) Whether the forwarded traffic from the VMs in the local virtual network will be allowed/disallowed in remote virtual network.
+  - Type: boolean
+- `allowGatewayTransit`: (Optional) If gateway links can be used in remote virtual networking to link to this virtual network.
+  - Type: boolean
+- `useRemoteGateways`: (Optional) If remote gateways can be used on this virtual network.
+  - Type: boolean
 - `remoteVirtualNetwork`: (Required) A `remoteVirtualNetwork` object.
   - Type: remoteVirtualNetwork
 

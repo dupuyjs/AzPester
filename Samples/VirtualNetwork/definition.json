@@ -124,6 +124,8 @@
                         {
                             "name": "{parameters.spokeNetwork.subnetName}",
                             "addressPrefix": "{parameters.spokeNetwork.subnetPrefix}",
+                            "privateEndpointNetworkPolicies": "Enabled",
+                            "privateLinkServiceNetworkPolicies": "Enabled",
                             "networkSecurityGroup": {
                                 "name": "{parameters.spokeNetwork.subnetNsgName}"
                             },
@@ -135,6 +137,10 @@
                     "virtualNetworkPeerings": [
                         {
                             "name": "spoke-one-to-hub",
+                            "allowVirtualNetworkAccess": true,
+                            "allowForwardedTraffic": false,
+                            "allowGatewayTransit": false,
+                            "useRemoteGateways": false,
                             "remoteVirtualNetwork": {
                                 "name": "{parameters.hubNetwork.name}"
                             }
