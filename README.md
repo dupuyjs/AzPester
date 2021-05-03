@@ -186,7 +186,7 @@ These resources will validate if service principals, managed identies and groups
 
 ### Network Documentation
 
-[Virtual Networks definition](Docs/Resources/Network/VirtualNetwork.md)
+[Virtual Network definition](Docs/Resources/Network/VirtualNetwork.md)
 
 These resources will validate if virtual networks are correctly provisioned with associated properties (ex. subnets, peerings).
 
