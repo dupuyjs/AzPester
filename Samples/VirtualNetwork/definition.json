@@ -8,13 +8,6 @@
         "resourceGroupName": {
             "type": "string"
         },
-        "vmSize": {
-            "type": "string",
-            "defaultValue": "Standard_A1_v2",
-            "metadata": {
-                "description": "The size for both Windows and Linux virtual machines."
-            }
-        },
         "hubNetwork": {
             "type": "object",
             "defaultValue": {
@@ -55,7 +48,6 @@
             "type": "object",
             "defaultValue": {
                 "name": "AzureBastionHost",
-                "publicIPAddressName": "pip-bastion",
                 "subnetName": "AzureBastionSubnet",
                 "nsgName": "nsg-hub-bastion",
                 "subnetPrefix": "10.0.1.0/29"
@@ -65,7 +57,6 @@
             "type": "object",
             "defaultValue": {
                 "name": "AzureFirewall",
-                "publicIPAddressName": "pip-firewall",
                 "subnetName": "AzureFirewallSubnet",
                 "subnetPrefix": "10.0.3.0/26",
                 "routeName": "r-nexthop-to-fw"
@@ -132,7 +123,13 @@
                     "subnets": [
                         {
                             "name": "{parameters.spokeNetwork.subnetName}",
-                            "addressPrefix": "{parameters.spokeNetwork.subnetPrefix}"
+                            "addressPrefix": "{parameters.spokeNetwork.subnetPrefix}",
+                            "networkSecurityGroup": {
+                                "name": "{parameters.spokeNetwork.subnetNsgName}"
+                            },
+                            "routeTable": {
+                                "name": "{parameters.azureFirewall.routeName}"
+                            }
                         }
                     ],
                     "virtualNetworkPeerings": [
@@ -155,7 +152,13 @@
                     "subnets": [
                         {
                             "name": "{parameters.spokeNetworkTwo.subnetName}",
-                            "addressPrefix": "{parameters.spokeNetworkTwo.subnetPrefix}"
+                            "addressPrefix": "{parameters.spokeNetworkTwo.subnetPrefix}",
+                            "networkSecurityGroup": {
+                                "name": "{parameters.spokeNetworkTwo.subnetNsgName}"
+                            },
+                            "routeTable": {
+                                "name": "{parameters.azureFirewall.routeName}"
+                            }
                         }
                     ],
                     "virtualNetworkPeerings": [
