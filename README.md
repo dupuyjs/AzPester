@@ -189,3 +189,7 @@ These resources will validate if service principals, managed identies and groups
 [Virtual Networks definition](Docs/Resources/Network/VirtualNetwork.md)
 
 These resources will validate if virtual networks are correctly provisioned with associated properties (ex. subnets, peerings).
+
+[Network Security Group definition](Docs/Resources/Network/NetworkSecurityGroup.md.md)
+
+These resources will validate if network security groups are correctly provisioned with associated security rules.
