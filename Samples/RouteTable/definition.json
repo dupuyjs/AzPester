@@ -1,0 +1,47 @@
+{
+    "$schema": "../../Source/Schemas/2021-04/schema.definition.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        },
+        "azureFirewall": {
+            "type": "object",
+            "defaultValue": {
+                "name": "AzureFirewall",
+                "subnetName": "AzureFirewallSubnet",
+                "subnetPrefix": "10.0.3.0/26",
+                "routeName": "r-nexthop-to-fw"
+            }
+        },
+        "location": {
+            "type": "string",
+            "defaultValue": "northeurope"
+        }
+    },
+    "contexts": {
+        "default": {
+            "subscriptionId": "{parameters.subscriptionId}",
+            "resourceGroupName": "{parameters.resourceGroupName}"
+        }
+    },
+    "definition": {
+        "network": {
+            "routeTables": [
+                {
+                    "name": "{parameters.azureFirewall.routeName}",
+                    "location": "{parameters.location}",
+                    "routes": [{
+                        "name": "{parameters.azureFirewall.routeName}",
+                        "addressPrefix": "0.0.0.0/0",
+                        "nextHopType": "VirtualAppliance",
+                        "nextHopIpAddress": "10.0.3.4"
+                    }]
+                }
+            ]
+        }
+    }
+}
