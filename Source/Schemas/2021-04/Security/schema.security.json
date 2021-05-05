@@ -1,0 +1,20 @@
+{
+    "id": "schema.security",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Security",
+    "description": "Schema for Security Section",
+    "definitions": {
+        "network": {
+            "type": "object",
+            "properties": {
+                "keyVaults": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "schema.network.keyvaults.json#/definitions/keyVault"
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}
