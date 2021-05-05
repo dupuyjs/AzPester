@@ -4,13 +4,13 @@
     "title": "Security",
     "description": "Schema for Security Section",
     "definitions": {
-        "network": {
+        "security": {
             "type": "object",
             "properties": {
                 "keyVaults": {
                     "type": "array",
                     "items": {
-                        "$ref": "schema.network.keyvaults.json#/definitions/keyVault"
+                        "$ref": "schema.security.keyvaults.json#/definitions/keyVault"
                     }
                 }
             },

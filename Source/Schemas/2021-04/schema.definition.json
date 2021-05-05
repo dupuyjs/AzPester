@@ -55,6 +55,9 @@
                 },
                 "identity": {
                     "$ref": "./Identity/schema.identity.json#/definitions/identity"
+                },
+                "security": {
+                    "$ref": "./Security/schema.security.json#/definitions/security"
                 }
             },
             "additionalProperties": false
