@@ -1,0 +1,62 @@
+{
+    "id": "schema.network.routetables",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Route Table",
+    "description": "Schema for Route Table Section",
+    "definitions": {
+        "routeTable": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the route table."
+                },
+                "location": {
+                    "type": "string",
+                    "description": "(Optional) The location of the route table."
+                },
+                "routes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/route"
+                    },
+                    "description": "(Optional) List of all routes."
+                }
+            }
+        },
+        "route": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The route name."
+                },
+                "addressPrefix": {
+                    "type": "string",
+                    "description": "(Optional) The destination CIDR to which the route applies."
+                },
+                "nextHopType": {
+                    "type": "string",
+                    "enum": [
+                        "VirtualNetworkGateway",
+                        "VnetLocal",
+                        "Internet",
+                        "VirtualAppliance",
+                        "None"
+                    ],
+                    "description": "(Optional) The type of Azure hop the packet should be sent to."
+                },
+                "nextHopIpAddress": {
+                    "type": "string",
+                    "description": "(Optional) The IP address packets should be forwarded to. Next hop values are only allowed in routes where the next hop type is VirtualAppliance."
+                }
+            }
+        }
+    }
+}

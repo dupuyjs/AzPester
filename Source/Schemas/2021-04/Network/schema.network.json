@@ -7,16 +7,22 @@
         "network": {
             "type": "object",
             "properties": {
-                "virtualNetworks": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "schema.network.virtualnetworks.json#/definitions/virtualNetwork"
-                    }
-                },
                 "networkSecurityGroups": {
                     "type": "array",
                     "items": {
                         "$ref": "schema.network.networksecuritygroups.json#/definitions/networkSecurityGroup"
+                    }
+                },
+                "routeTables": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "schema.network.routetables.json#/definitions/routeTable"
+                    }
+                },
+                "virtualNetworks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "schema.network.virtualnetworks.json#/definitions/virtualNetwork"
                     }
                 }
             },
