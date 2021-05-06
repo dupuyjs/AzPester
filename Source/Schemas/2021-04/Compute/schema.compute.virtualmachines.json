@@ -1,0 +1,48 @@
+{
+    "id": "schema.network.virtualnetworks",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Virtual Network",
+    "description": "Schema for Virtual Network Section",
+    "definitions": {
+        "virtualMachine": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the virtual machine."
+                },
+                "location": {
+                    "type": "string",
+                    "description": "(Optional) Resource location"
+                },
+                "vmSize": {
+                    "type": "string",        
+                    "description": "(Optional) Specifies the size of the virtual machine."
+                },
+                "imageReference": {
+                    "type": "string",
+                    "description": "(Optional) Image Resource ID"
+                },
+                "subnet": {
+                    "type": "string",
+                    "description": "(Optional) Subnet name"
+                },
+                "userAssignedIdentity": {
+                    "type": "string",
+                    "description": "(Required) The Resource ID of the User Assigned Managed Identity"
+                },
+                "autoShutdownDailyRecurrence": {
+                    "type": "string",
+                    "description": "(Optional) The time of day the schedule will occur."
+                },
+                "autoShutdownTimeZone": {
+                    "type": "string",
+                    "description": "(Optional) The time zone ID (e.g. Pacific Standard time)."
+                }
+            }
+        }
+    }
+}
