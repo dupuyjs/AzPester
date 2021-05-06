@@ -8,7 +8,8 @@
             "type": "object",
             "required": [
                 "targetUrl",
-                "targetPort"
+                "targetPort",
+                "source"
             ],
             "properties":{
                 "targetUrl": {
@@ -21,6 +22,7 @@
                 },
                 "source": {
                     "type": "object",
+                    "description": "(Required) The source subnet from where the resource access check must be done." ,
                     "required": [
                         "vnet",
                         "subnet"
