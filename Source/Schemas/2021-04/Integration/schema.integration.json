@@ -1,5 +1,5 @@
 {
-    "id": "schema.network.integration",
+    "id": "schema.integration",
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "title": "Integration",
     "description": "Schema for Integration Section",

@@ -1,15 +1,18 @@
 {
     "$schema": "../../Source/Schemas/2021-04/schema.definition.json",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
+    "parameters": {
+        "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        }
+    },
     "contexts": {
         "default": {
             "subscriptionId": "{parameters.subscriptionId}",
             "resourceGroupName": "{parameters.resourceGroupName}"
-        },
-        "sub2": {
-            "subscriptionId": "{parameters.subscription2Id}",
-            "resourceGroupName": "{parameters.resourceGroup2Name}"
         }
     },
     "definition": {
@@ -24,12 +27,6 @@
                     "vnet": "vnet-1",
                     "subnet": "subnet-2",
                     "sku": "Standard_DS2_v2"
-                },
-                "vm3": {
-                    "vnet": "vnet-2",
-                    "subnet": "subnet-1",
-                    "sku": "Standard_DS2_v2",
-                    "context": "sub2"
                 }
             },
             "resourceAccessChecks": [
@@ -37,11 +34,6 @@
                     "targetHost": "bing.com",
                     "targetPort": 443,
                     "runFrom": ["vm1", "vm2"]
-                },
-                {
-                    "targetHost": "google.com",
-                    "targetPort": 22,
-                    "runFrom": ["vm1", "vm2", "vm3"]
                 }
             ]
         }
