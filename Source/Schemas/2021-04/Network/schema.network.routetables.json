@@ -29,7 +29,8 @@
                     },
                     "description": "(Optional) List of all routes."
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "route": {
             "type": "object",
@@ -60,7 +61,8 @@
                     "type": "string",
                     "description": "(Optional) The IP address packets should be forwarded to. Next hop values are only allowed in routes where the next hop type is VirtualAppliance."
                 }
-            }
+            },
+            "additionalProperties": false
         }
     }
 }

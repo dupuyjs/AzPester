@@ -28,7 +28,8 @@
                         "$ref": "#/definitions/securityRule"
                     }
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "securityRule": {
             "type": "object",
@@ -124,7 +125,8 @@
                         "Outbound"
                     ]
                 }
-            }
+            },
+            "additionalProperties": false
         }
     }
 }
