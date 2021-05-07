@@ -14,6 +14,10 @@
                     "type": "string",
                     "description": "(Required) The name of the route table."
                 },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The context name used for this resource."
+                },
                 "location": {
                     "type": "string",
                     "description": "(Optional) The location of the route table."
