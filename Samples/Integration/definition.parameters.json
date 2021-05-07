@@ -7,6 +7,27 @@
         },
         "resourceGroupName": {
             "value": "__RESOURCE_GROUP_NAME__"
+        },
+        "location": {
+            "value": "__LOCATION__"
+        },
+        "testResourceGroupName": {
+            "value": "__TEST_RESOURCE_GROUP_NAME__"
+        },
+        "sshPublicKey": {
+            "value": "__TEST_SSH_PUBLIC_KEY__"
+        },
+        "testVmSku": {
+            "value": "__TEST_VM_SKU__"
+        },
+        "vnet": {
+            "value": "__RUNNERS_VNET__"
+        },
+        "subnet1": {
+            "value": "__RUNNER_SUBNET_1__"
+        },
+        "subnet2": {
+            "value": "__RUNNER_SUBNET_2_"
         }
     }
 }

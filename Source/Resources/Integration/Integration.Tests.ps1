@@ -7,32 +7,34 @@ param (
 
 BeforeDiscovery {
     Import-Module -Force $PSScriptRoot/Parsers/Definition.psm1
+    Import-Module -Force $PSScriptRoot/Integration.Infrastructure.psm1
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-
     $ResourceAccessChecks = Find-ResourceAccessChecks -Definition $Definition
-    $Runners = Find-Runners -Definition $Definition
 }
 
-BeforeAll {
-    # Create integration test runners
-    foreach ($runner in $Runners.GetEnumerator()) {
-        Write-Host $runner.key
-        Write-Host $runner.value.vnet
+Describe 'Integration Tests' {
+    BeforeAll {
+        # Deploy testing infrastructure according to integration tests definition file.
+        $TestDeploymentInfo = Find-TestDeploymentInfo -Definition $Definition
+        $Runners = Find-Runners -Definition $Definition -Contexts $Contexts
+        New-TestInfrastructure -TestDeploymentInfo $TestDeploymentInfo -Runners $Runners -Contexts $Contexts
     }
-}
 
-AfterAll {
-    # Delete integration test runners
-    foreach ($runner in $Runners.GetEnumerator()) {
-        Write-Host $runner.key
-        Write-Host $runner.value.vnet
+    AfterAll {
+        $TestDeploymentInfo = Find-TestDeploymentInfo -Definition $Definition
+        if ($TestDeploymentInfo.cleanupTestDeployment) {
+            Remove-TestInfrastructure -TestDeploymentInfo $TestDeploymentInfo
+        } else {
+            Write-Information "[##] Skipping clean up of test infrastructure."
+        }
     }
-}
 
-Describe 'Resource Access Checks <targetHost>:<targetPort>' -ForEach $ResourceAccessChecks {
-    Context 'Runner <_>' -Foreach $_.runners {
-        It 'Check resource access from runner <name>' {
-            # todo
+    Context 'Resource Access Check - Target Host: <targetHost>:<targetPort>' -Foreach $ResourceAccessChecks {
+        It '<targetHost>:<targetPort> is reachable from <_>' -ForEach $runFrom {
+            $runner = $Runners[$_]
+            Write-Information "    [#] Test will be executed from virtual machine $($runner.vm.Id)."
+            $result = $true
+            $result | Should -BeTrue
         }
     }
 }

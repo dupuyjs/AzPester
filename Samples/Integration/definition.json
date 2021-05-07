@@ -7,6 +7,27 @@
         },
         "resourceGroupName": {
             "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "testResourceGroupName": {
+            "type": "string"
+        },
+        "sshPublicKey": {
+            "type": "string"    
+        },
+        "testVmSku": {
+            "type": "string"
+        },
+        "vnet": {
+            "type": "string"
+        },
+        "subnet1": {
+            "type": "string"
+        },
+        "subnet2": {
+            "type": "string"
         }
     },
     "contexts": {
@@ -17,21 +38,33 @@
     },
     "definition": {
         "integration": {
+            "testDeploymentInfo": {
+                "location": "{parameters.location}",
+                "resourceGroupName": "{parameters.testResourceGroupName}",
+                "cleanupTestDeployment": true 
+            },
             "runners": {
                 "vm1": {
-                    "vnet": "vnet-1",
-                    "subnet": "subnet-1",
-                    "sku": "Standard_DS2_v2"
+                    "vnet": "{parameters.vnet}",
+                    "subnet": "{parameters.subnet1}",
+                    "sku": "{parameters.testVmSku}",
+                    "sshPublicKey": "{parameters.sshPublicKey}"
                 },
                 "vm2": {
-                    "vnet": "vnet-1",
-                    "subnet": "subnet-2",
-                    "sku": "Standard_DS2_v2"
+                    "vnet": "{parameters.vnet}",
+                    "subnet": "{parameters.subnet2}",
+                    "sku": "{parameters.testVmSku}",
+                    "sshPublicKey": "{parameters.sshPublicKey}"
                 }
             },
             "resourceAccessChecks": [
                 {
                     "targetHost": "bing.com",
+                    "targetPort": 443,
+                    "runFrom": ["vm1", "vm2"]
+                },
+                {
+                    "targetHost": "google.com",
                     "targetPort": 443,
                     "runFrom": ["vm1", "vm2"]
                 }

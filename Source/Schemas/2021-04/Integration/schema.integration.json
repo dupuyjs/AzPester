@@ -8,6 +8,28 @@
             "type": "object",
             "description": "",
             "properties": {
+                "testDeploymentInfo": {
+                    "type": "object",
+                    "properties": {
+                        "resourceGroupName": {
+                            "type": "string",
+                            "description": "(Required) The name of the resource group that will be created for the test runners / infrastructure."
+                        },
+                        "location": {
+                            "type": "string",
+                            "description": "(Required) The Azure location where will be created the test runners / infrastructure."
+                        },
+                        "cleanupTestDeployment": {
+                            "type": "boolean",
+                            "description": "(Optional) A flag that indicates if the test infrastructure will be cleaned up after the integration tests."
+                        }
+                    },
+                    "required": [
+                        "resourceGroupName",
+                        "location"
+                    ],
+                    "additionalProperties": false
+                },
                 "runners": {
                     "type": "object",
                     "additionalProperties": {
@@ -22,6 +44,10 @@
                     }
                 }
             },
+            "required": [
+                "testDeploymentInfo",
+                "runners"
+            ],
             "additionalProperties": false
         },
         "resourceAccessCheck":{
@@ -55,7 +81,8 @@
             "required": [
                 "vnet",
                 "subnet",
-                "sku"
+                "sku",
+                "sshPublicKey"
             ],
             "properties": {
                 "vnet": {
@@ -69,6 +96,10 @@
                 "sku": {
                     "type": "string",
                     "description": "(Required) The SKU to use for the runner." 
+                },
+                "sshPublicKey": {
+                    "type": "string",
+                    "description": "(Required) The SSH public key to use for the runner." 
                 },
                 "context": {
                     "type": "string",
