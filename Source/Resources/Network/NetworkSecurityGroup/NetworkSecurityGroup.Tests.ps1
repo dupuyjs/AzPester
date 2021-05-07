@@ -1,8 +1,6 @@
 param (
     [Parameter(Mandatory = $true)]
-    [PSObject] $Definition,
-    [Parameter(Mandatory = $true)]
-    [PSObject] $Contexts
+    [PSObject] $Definition
 )
 
 BeforeDiscovery {
@@ -18,7 +16,7 @@ BeforeAll {
 Describe 'Network Security Group <name> Acceptance Tests' -ForEach $NetworkSecurityGroups {
     BeforeAll {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-        $networkSecurityGroup = Get-NetworkSecurityGroup -Definition $Definition -Contexts $Contexts -Name $name
+        $networkSecurityGroup = Get-NetworkSecurityGroup -Definition $Definition -Name $name -Context $context
     }
 
     Context 'Network Security Group <name>' {
