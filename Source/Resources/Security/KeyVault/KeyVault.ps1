@@ -8,6 +8,27 @@ function Get-IdentityTypes {
     return [IdentityTypes]::new()
 }
 
+function Get-Context {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [PSObject] $Definition,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Context
+    )
+
+    $defContexts = $Definition.contexts
+    $curContext = ${defContexts}?[$Context]
+
+    if ($null -ne $curContext) {
+        return $curContext
+    }
+    else {
+        throw "Context $Context is unknown. This context should be referenced in contexts section."
+    }
+}
+
 function Get-IdentityObjectId {
     param(
         [Parameter(Mandatory = $true)]
@@ -18,20 +39,17 @@ function Get-IdentityObjectId {
         [String] $Type,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Name
+        [String] $Name,
+        [Parameter(Mandatory = $false)]
+        [String] $Context
     )
-
-    $resourceGroupName = $Contexts.default.resourceGroupName
-    if ([string]::IsNullOrWhiteSpace($resourceGroupName)) {
-        throw 'The default resourceGroupName input value is Null|Empty or WhiteSpace.'
-    }
 
     if($Type -eq (Get-IdentityTypes)::ServicePrincipal) {
         $identity = Get-AzADServicePrincipal -DisplayName $name
         return $identity.Id
     }
     elseif($Type -eq (Get-IdentityTypes)::ManagedIdentity) {
-        $identity = Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName -Name $Name
+        $identity = Get-UserAssignedIdentity -Definition $Definition -Name $Name -Context $Context
         return $identity.PrincipalId
     }
     elseif($Type -eq (Get-IdentityTypes)::Group) {
@@ -43,43 +61,66 @@ function Get-IdentityObjectId {
     }
 }
 
+function Get-UserAssignedIdentity {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [PSObject] $Definition,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Name,
+        [Parameter(Mandatory = $false)]
+        [String] $Context
+    )
+
+    if ($Context) {
+        $curContext = Get-Context -Definition $Definition -Context $Context
+
+        $uami = Get-AzUserAssignedIdentity `
+            -ResourceGroupName $curContext.ResourceGroupName `
+            -Name $Name `
+            -DefaultProfile $curContext.Context
+        return $uami
+    }
+    else {
+        $resourceGroupName = $Definition.contexts.default.ResourceGroupName
+        if ([string]::IsNullOrWhiteSpace($ResourceGroupName)) {
+            throw 'The default context resource group name is Null|Empty or WhiteSpace.'
+        }
+
+        Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName -Name $Name
+    }
+}
+
 function Get-KeyVault {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts,
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name,
         [Parameter(Mandatory = $false)]
-        [String] $SubscriptionId,
-        [Parameter(Mandatory = $false)]
-        [String] $ResourceGroupName
+        [String] $Context
     )
 
-    if(!$ResourceGroupName) {
-        $ResourceGroupName = $Contexts.default.resourceGroupName
+    if ($Context) {
+        $curContext = Get-Context -Definition $Definition -Context $Context
+
+        $keyVault = Get-AzKeyVault `
+            -ResourceGroupName $curContext.ResourceGroupName `
+            -VaultName $Name `
+            -DefaultProfile $curContext.Context
+        return $keyVault
+    }
+    else {
+        $resourceGroupName = $Definition.contexts.default.ResourceGroupName
         if ([string]::IsNullOrWhiteSpace($ResourceGroupName)) {
-            throw 'The default resourceGroupName input value is Null|Empty or WhiteSpace.'
-        }
-    }
-
-    if($SubscriptionId) {
-        ForEach ($context in $Contexts.GetEnumerator()) {
-            if ($context.Value.SubscriptionId -eq $SubscriptionId) {
-                # Get virtual network
-                $keyVault = Get-AzKeyVault -ResourceGroupName $ResourceGroupName -VaultName $Name -DefaultProfile $context.Value.Context
-                return $keyVault 
-            }
+            throw 'The default context resource group name is Null|Empty or WhiteSpace.'
         }
 
-        Write-Host "Warning: Subscription $SubscriptionId is unknown. This subscription should be referenced in contexts." -ForegroundColor Yellow
+        Get-AzKeyVault -ResourceGroupName $resourceGroupName -VaultName $Name
     }
-    
-    Get-AzKeyVault -ResourceGroupName $ResourceGroupName -VaultName $Name
 }
 
 function Get-KeyVaultSecret {
@@ -88,31 +129,32 @@ function Get-KeyVaultSecret {
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts,
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $VaultName,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name,
         [Parameter(Mandatory = $false)]
-        [String] $SubscriptionId
+        [String] $Context
     )
 
-    if($SubscriptionId) {
-        ForEach ($context in $Contexts.GetEnumerator()) {
-            if ($context.Value.SubscriptionId -eq $SubscriptionId) {
-                # Get secret
-                $secret = Get-AzKeyVaultSecret -VaultName $VaultName -Name $Name -DefaultProfile $context.Value.Context
-                return $secret 
-            }
+    if ($Context) {
+        $curContext = Get-Context -Definition $Definition -Context $Context
+
+        $secret = Get-AzKeyVaultSecret `
+            -VaultName $VaultName `
+            -Name $Name `
+            -DefaultProfile $curContext.Context
+        return $secret
+    }
+    else {
+        $resourceGroupName = $Definition.contexts.default.ResourceGroupName
+        if ([string]::IsNullOrWhiteSpace($ResourceGroupName)) {
+            throw 'The default context resource group name is Null|Empty or WhiteSpace.'
         }
 
-        Write-Host "Warning: Subscription $SubscriptionId is unknown. This subscription should be referenced in contexts." -ForegroundColor Yellow
+        Get-AzKeyVaultSecret -VaultName $VaultName -Name $Name
     }
-    
-    Get-AzKeyVaultSecret -VaultName $VaultName -Name $Name
 }
 
 function Get-KeyVaultKey {
@@ -121,31 +163,32 @@ function Get-KeyVaultKey {
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts,
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $VaultName,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name,
         [Parameter(Mandatory = $false)]
-        [String] $SubscriptionId
+        [String] $Context
     )
 
-    if($SubscriptionId) {
-        ForEach ($context in $Contexts.GetEnumerator()) {
-            if ($context.Value.SubscriptionId -eq $SubscriptionId) {
-                # Get key
-                $key = Get-AzKeyVaultKey -VaultName $VaultName -Name $Name -DefaultProfile $context.Value.Context
-                return $key 
-            }
+    if ($Context) {
+        $curContext = Get-Context -Definition $Definition -Context $Context
+
+        $key = Get-AzKeyVaultKey `
+            -VaultName $VaultName `
+            -Name $Name `
+            -DefaultProfile $curContext.Context
+        return $key
+    }
+    else {
+        $resourceGroupName = $Definition.contexts.default.ResourceGroupName
+        if ([string]::IsNullOrWhiteSpace($ResourceGroupName)) {
+            throw 'The default context resource group name is Null|Empty or WhiteSpace.'
         }
 
-        Write-Host "Warning: Subscription $SubscriptionId is unknown. This subscription should be referenced in contexts." -ForegroundColor Yellow
+        Get-AzKeyVaultKey -VaultName $VaultName -Name $Name
     }
-    
-    Get-AzKeyVaultKey  -VaultName $VaultName -Name $Name
 }
 
 function Get-KeyVaultCertificate {
@@ -154,29 +197,30 @@ function Get-KeyVaultCertificate {
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts,
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $VaultName,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name,
         [Parameter(Mandatory = $false)]
-        [String] $SubscriptionId
+        [String] $Context
     )
 
-    if($SubscriptionId) {
-        ForEach ($context in $Contexts.GetEnumerator()) {
-            if ($context.Value.SubscriptionId -eq $SubscriptionId) {
-                # Get certificate
-                $certificate = Get-AzKeyVaultCertificate -VaultName $VaultName -Name $Name -DefaultProfile $context.Value.Context
-                return $certificate 
-            }
+    if ($Context) {
+        $curContext = Get-Context -Definition $Definition -Context $Context
+
+        $certificate = Get-AzKeyVaultCertificate `
+            -VaultName $VaultName `
+            -Name $Name `
+            -DefaultProfile $curContext.Context
+        return $certificate
+    }
+    else {
+        $resourceGroupName = $Definition.contexts.default.ResourceGroupName
+        if ([string]::IsNullOrWhiteSpace($ResourceGroupName)) {
+            throw 'The default context resource group name is Null|Empty or WhiteSpace.'
         }
 
-        Write-Host "Warning: Subscription $SubscriptionId is unknown. This subscription should be referenced in contexts." -ForegroundColor Yellow
+        Get-AzKeyVaultCertificate -VaultName $VaultName -Name $Name
     }
-    
-    Get-AzKeyVaultCertificate  -VaultName $VaultName -Name $Name
 }
