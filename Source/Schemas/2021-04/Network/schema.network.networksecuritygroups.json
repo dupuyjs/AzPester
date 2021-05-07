@@ -27,6 +27,12 @@
                     "items": {
                         "$ref": "#/definitions/securityRule"
                     }
+                },
+                "defaultSecurityRules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/securityRule"
+                    }
                 }
             },
             "additionalProperties": false
@@ -37,6 +43,10 @@
                 "name"
             ],
             "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the security rule."
+                },
                 "protocol": {
                     "type": "string",
                     "description": "(Optional) The network protocol this rule applies to.",

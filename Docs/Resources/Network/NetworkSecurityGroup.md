@@ -133,11 +133,15 @@ For more details about contexts, please read the [REAME.md](../../../README.md) 
   - Type: string
 - `securityRules`: (Optional) An array of `securityRule` objects.
   - Type: securityRule[]
+- `defaultSecurityRules`: (Optional) An array of `securityRule` objects.
+  - Type: securityRule[]
 
 ### securityRule object
 
 A network security group contains security rules that allow or deny inbound network traffic to, or outbound network traffic from, several types of Azure resources. For each rule, you can specify source and destination, port, and protocol.
 
+- `name`: (Required) The name of the security rule.
+  - Type: string
 - `protocol`: (Optional) The network protocol this rule applies to.
   - Type: string
   - Valid Values: `Tcp`,`Udp`,`Icmp`,`Esp`,`Ah` or `*`
