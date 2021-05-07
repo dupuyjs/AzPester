@@ -14,6 +14,10 @@
                     "type": "string",
                     "description": "(Required) The name of the network security group."
                 },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The context name used for this resource."
+                },
                 "location": {
                     "type": "string",
                     "description": "(Optional) The location/region where the network security group has been created."
