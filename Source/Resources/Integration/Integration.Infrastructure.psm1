@@ -88,7 +88,7 @@ function New-TestInfrastructure {
                 -Skus '18.04-LTS' `
                 -Version latest
             
-            # Ephemeral OS: https://docs.microsoft.com/fr-fr/azure/virtual-machines/ephemeral-os-disks
+            # Ephemeral OS: https://docs.microsoft.com/en-us/azure/virtual-machines/ephemeral-os-disks
             $virtualMachine = Set-AzVMOSDisk -VM $virtualMachine `
                 -DiffDiskSetting Local `
                 -Caching ReadOnly `
@@ -133,5 +133,40 @@ function Remove-TestInfrastructure {
     Write-Information "[#] Resource group $ResourceGroupName has been removed."
 }
 
+function Invoke-CheckResourceAccessCommand {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $RunnerVmId,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Hostname,
+        [Parameter(Mandatory = $true)]
+        [Int64] $Port,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [PSObject] $RunnerContext
+    )
+
+    $runCommandResult = Invoke-AzVMRunCommand -ResourceId $RunnerVmId `
+        -CommandId RunShellScript `
+        -ScriptPath "$($PSScriptRoot)/resource-access-check.sh" `
+        -Parameter @{ 'Hostname' = $Hostname; 'Port' = $Port } `
+        -DefaultProfile $RunnerContext.Context
+
+    $result = @{ExitCode=-1}
+    $result.Status = $runCommandResult.Status
+    
+    $message = $runCommandResult.Value[0].Message
+    $found = $message -match '\[SCRIPT_EXIT_CODE=(\d+)\]'
+
+    if($found) {
+        $result.ExitCode = ($matches[1] -as [int])
+    }
+    
+    return $result
+}
+
 Export-ModuleMember -Function New-TestInfrastructure
 Export-ModuleMember -Function Remove-TestInfrastructure
+Export-ModuleMember -Function Invoke-CheckResourceAccessCommand

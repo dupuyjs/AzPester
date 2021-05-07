@@ -24,10 +24,32 @@ function Find-ResourceAccessChecks{
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [PSObject] $Definition
+        [PSObject] $Definition,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [PSObject] $Contexts
     )
 
     $resourceAccessChecks = $Definition.integration.resourceAccessChecks
+
+    # resolve runner reference for each resource access check
+    foreach ($resourceAccessCheck in $resourceAccessChecks) {
+        [System.Collections.Hashtable]$allRunners = Find-Runners -Definition $Definition -Contexts $Contexts
+        [System.Collections.ArrayList]$runnerRefs = @()
+
+        foreach ($runnerKey in $resourceAccessCheck.runFrom) {
+            if(-not $allRunners.ContainsKey($runnerKey)) {
+                throw "No runner with key $($runnerKey) was found in the runners definition."
+            }
+
+            $runner = $allRunners[$runnerKey]
+            $runnerRef = @{Key=$runnerKey; Source="$($runner.vnet)/$($runner.subnet)"}
+            
+            $runnerRefs.Add($runnerRef)
+        }
+
+        $resourceAccessCheck.runnerRefs = $runnerRefs
+    }
     return $resourceAccessChecks
 }
 

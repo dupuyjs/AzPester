@@ -9,7 +9,7 @@ BeforeDiscovery {
     Import-Module -Force $PSScriptRoot/Parsers/Definition.psm1
     Import-Module -Force $PSScriptRoot/Integration.Infrastructure.psm1
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-    $ResourceAccessChecks = Find-ResourceAccessChecks -Definition $Definition
+    $ResourceAccessChecks = Find-ResourceAccessChecks -Definition $Definition -Contexts $Contexts
 }
 
 Describe 'Integration Tests' {
@@ -30,11 +30,17 @@ Describe 'Integration Tests' {
     }
 
     Context 'Resource Access Check - Target Host: <targetHost>:<targetPort>' -Foreach $ResourceAccessChecks {
-        It '<targetHost>:<targetPort> is reachable from <_>' -ForEach $runFrom {
-            $runner = $Runners[$_]
+        It '<targetHost>:<targetPort> is reachable from <_.Source>' -ForEach $runnerRefs {
+            $runner = $Runners[$_.Key]
             Write-Information "    [#] Test will be executed from virtual machine $($runner.vm.Id)."
-            $result = $true
-            $result | Should -BeTrue
+
+            $result = Invoke-CheckResourceAccessCommand -RunnerVmId $runner.vm.Id `
+                -RunnerContext $runner.context `
+                -Hostname $targetHost `
+                -Port $targetPort `
+            
+            $result.Status | Should -Be 'Succeeded'
+            $result.ExitCode | Should -Be 0
         }
     }
 }
