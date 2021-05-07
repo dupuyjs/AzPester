@@ -28,24 +28,17 @@
         },
         "contexts": {
             "type": "object",
+            "required": [
+                "default"
+            ],
             "properties": {
                 "default": {
-                    "$ref": "#/definitions/context",
-                    "required": [
-                        "subscriptionId",
-                        "resourceGroupName"
-                    ]
+                    "$ref": "#/definitions/context"
                 }
             },
             "additionalProperties": {
-                "$ref": "#/definitions/context",
-                "required": [
-                    "subscriptionId"
-                ]
-            },
-            "required": [
-                "default"
-            ]
+                "$ref": "#/definitions/context"
+            }
         },
         "definition": {
             "type": "object",
@@ -106,6 +99,10 @@
         },
         "context": {
             "type": "object",
+            "required": [
+                "subscriptionId",
+                "resourceGroupName"
+            ],
             "properties": {
                 "subscriptionId": {
                     "type": "string",
