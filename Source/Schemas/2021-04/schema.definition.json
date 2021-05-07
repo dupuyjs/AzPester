@@ -51,6 +51,9 @@
                 },
                 "security": {
                     "$ref": "./Security/schema.security.json#/definitions/security"
+                },
+                "compute": {
+                    "$ref": "./Compute/schema.compute.json#/definitions/compute"
                 }
             },
             "additionalProperties": false

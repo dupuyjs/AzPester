@@ -60,6 +60,10 @@
                         "version": {
                             "type": "string",
                             "description": "(Required) The Virtual Machine Image version."
+                        },
+                        "context": {
+                            "type": "string",
+                            "description": "(Optional) The name of the Azure context to use to resolve the gallery." 
                         }
                     }
                 },
