@@ -1,8 +1,6 @@
 param (
     [Parameter(Mandatory = $true)]
-    [PSObject] $Definition,
-    [Parameter(Mandatory = $true)]
-    [PSObject] $Contexts
+    [PSObject] $Definition
 )
 
 BeforeDiscovery {
@@ -18,7 +16,7 @@ BeforeAll {
 Describe 'Virtual Network <name> Acceptance Tests' -ForEach $VirtualNetworks {
     BeforeAll {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-        $virtualNetwork = Get-VirtualNetwork -Definition $Definition -Contexts $Contexts -Name $name
+        $virtualNetwork = Get-VirtualNetwork -Definition $Definition -Name $name -Context $context
     }
 
     Context 'Virtual Network <name>'{
@@ -48,20 +46,16 @@ Describe 'Virtual Network <name> Acceptance Tests' -ForEach $VirtualNetworks {
         It 'Validate subnet <propertyName> is <displayValue>' -ForEach $properties {
             if($propertyName -eq 'networkSecurityGroup') {
                 $nsg = Get-NetworkSecurityGroup -Definition $Definition `
-                                                -Contexts $Contexts `
                                                 -Name $propertyValue.name `
-                                                -SubscriptionId $propertyValue.subscriptionId `
-                                                -ResourceGroupName $propertyValue.resourceGroupName
+                                                -Context $propertyValue.context
 
                 $nsg | Should -Not -BeNullOrEmpty
                 $Subnet.NetworkSecurityGroup.Id | Should -Be $nsg.Id
             }
             elseif($propertyName -eq 'routeTable') {
                 $routeTable = Get-RouteTable -Definition $Definition `
-                                             -Contexts $Contexts `
                                              -Name $propertyValue.name `
-                                             -SubscriptionId $propertyValue.subscriptionId `
-                                             -ResourceGroupName $propertyValue.resourceGroupName
+                                             -Context $propertyValue.context
                                              
                 $routeTable | Should -Not -BeNullOrEmpty
                 $Subnet.RouteTable.Id | Should -Be $routeTable.Id
@@ -82,10 +76,8 @@ Describe 'Virtual Network <name> Acceptance Tests' -ForEach $VirtualNetworks {
 
         It 'Validate virtual network peering with <remoteVirtualNetwork.name> is connected' {
             $remoteVirtualNetwork = Get-VirtualNetwork -Definition $Definition `
-                                                       -Contexts $Contexts `
                                                        -Name $remoteVirtualNetwork.name `
-                                                       -SubscriptionId $remoteVirtualNetwork.subscriptionId `
-                                                       -ResourceGroupName $remoteVirtualNetwork.resourceGroupName 
+                                                       -Context $remoteVirtualNetwork.context
             
             $peering | Should -Not -BeNullOrEmpty
             $peering.RemoteVirtualNetwork.Id | Should -Be $remoteVirtualNetwork.Id
