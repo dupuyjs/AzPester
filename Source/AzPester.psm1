@@ -7,13 +7,20 @@ function Invoke-AzPester {
         [String] $Parameters
     )
 
-    $isValidSchemas = Assert-Schemas -Definition $Definition -Parameters $Parameters
+    $definitionJson = Get-Content $Definition -Raw
+
+    # Parameters file is optional
+    if ($Parameters) {
+        $parametersJson = Get-Content $Parameters -Raw
+    }
+
+    $isValidSchemas = Assert-Schemas -DefinitionJson $definitionJson -ParametersJson $parametersJson
 
     if ($isValidSchemas) {
-        $isValidParameters = Assert-Parameters -Definition $Definition -Parameters $Parameters
+        $isValidParameters = Assert-Parameters -DefinitionJson $definitionJson -ParametersJson $parametersJson
 
         if ($isValidParameters) {
-            $definitionWithParameters = Set-Parameters -Definition $Definition -Parameters $Parameters
+            $definitionWithParameters = Set-Parameters -DefinitionJson $definitionJson -ParametersJson $parametersJson
             # Getting contexts and assigning them to the definition
             $contexts = Get-Contexts -Definition $definitionWithParameters
             $definitionWithParameters.definition.contexts = $contexts
@@ -31,25 +38,23 @@ function Assert-Schemas {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Definition,
+        [String] $DefinitionJson,
         [Parameter(Mandatory = $false)]
-        [String] $Parameters
+        [String] $ParametersJson
     )
 
     $parametersSchema = "$PSScriptRoot/Schemas/2021-04/schema.definition.parameters.json"
     $definitionSchema = "$PSScriptRoot/Schemas/2021-04/schema.definition.json"
 
-    $definitionJson = Get-Content $Definition -Raw
-    $isValidDefinitionSchema = Test-Json -Json $definitionJson -SchemaFile $definitionSchema
+    $isValidDefinitionSchema = Test-Json -Json $DefinitionJson -SchemaFile $definitionSchema
     if (!$isValidDefinitionSchema) {
         Write-Host "Validation Failed: Please check definition file, schema is invalid." -ForegroundColor Red
         return $false
     }
 
     # Parameters file is optional
-    if ($Parameters) {
-        $parametersJson = Get-Content $Parameters -Raw
-        $isValidParametersSchema = Test-Json -Json $parametersJson -SchemaFile $parametersSchema
+    if ($ParametersJson) {
+        $isValidParametersSchema = Test-Json -Json $ParametersJson -SchemaFile $parametersSchema
         if (!$isValidParametersSchema) {
             Write-Host "Validation Failed: Please check parameters file, schema is invalid." -ForegroundColor Red
             return $false
@@ -63,18 +68,16 @@ function Assert-Parameters {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Definition,
+        [String] $DefinitionJson,
         [Parameter(Mandatory = $false)]
-        [String] $Parameters
+        [String] $ParametersJson
     )
 
-    $definitionJson = Get-Content $Definition -Raw
-    $targetParameters = ($definitionJson | ConvertFrom-Json -AsHashtable).parameters
+    $targetParameters = ($DefinitionJson | ConvertFrom-Json -AsHashtable).parameters
 
     # Parameters file is optional
-    if ($Parameters) {
-        $parametersJson = Get-Content $Parameters -Raw
-        $sourceParameters = ($parametersJson | ConvertFrom-Json -AsHashtable).parameters
+    if ($ParametersJson) {
+        $sourceParameters = ($ParametersJson | ConvertFrom-Json -AsHashtable).parameters
 
         if ($targetParameters) {
             foreach ($parameter in $targetParameters.GetEnumerator()) {
@@ -103,22 +106,20 @@ function Set-Parameters {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Definition,
+        [String] $DefinitionJson,
         [Parameter(Mandatory = $false)]
-        [String] $Parameters
+        [String] $ParametersJson
     )
 
-    $definitionJson = Get-Content $Definition -Raw
-    $targetParameters = ($definitionJson | ConvertFrom-Json -AsHashtable).parameters
+    $targetParameters = ($DefinitionJson | ConvertFrom-Json -AsHashtable).parameters
     
     # Parameters file is optional
-    if ($Parameters) {
-        $parametersJson = Get-Content $Parameters -Raw
-        $sourceParameters = ($parametersJson | ConvertFrom-Json -AsHashtable).parameters
+    if ($ParametersJson) {
+        $sourceParameters = ($ParametersJson | ConvertFrom-Json -AsHashtable).parameters
     }
     
     # Regular expression used to get all expression placeholders
-    $results = $definitionJson | Select-String '\{parameters.[a-zA-Z0-9_.-]+}' -AllMatches
+    $results = $DefinitionJson | Select-String '\{parameters.[a-zA-Z0-9_.-]+}' -AllMatches
 
     # Create an hashtable with placeholders and associated values
     $placeHolders = @{}
@@ -164,10 +165,10 @@ function Set-Parameters {
 
     # Update json file with placeholder values
     foreach ($placeHolder in $placeHolders.GetEnumerator()) {
-        $definitionJson = $definitionJson -replace $placeHolder.key, $placeHolder.value
+        $DefinitionJson = $DefinitionJson -replace $placeHolder.key, $placeHolder.value
     }
 
-    return ($definitionJson | ConvertFrom-Json -AsHashtable)
+    return ($DefinitionJson | ConvertFrom-Json -AsHashtable)
 }
 
 function Get-Contexts {
