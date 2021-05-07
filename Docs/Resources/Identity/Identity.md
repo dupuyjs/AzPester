@@ -42,6 +42,13 @@
 
 - `name`: (Required) The identity name.
   - Type: string
+- `context`: (Optional) The context name used for this resource. default context used if not specified. Used only if type is `ManagedIdentity`.
+  - Type: string
+
+Note: You can target a subscription different than default one by using `context` property. However, you have to reference the associated subscription identifier and resource group name in the `contexts` section.
+
+For more details about contexts, please read the [REAME.md](../../../README.md) file.
+
 - `type`: (Required) The identity type.
   - Type: string
   - Valid Values: `ServicePrincipal`, `ManagedIdentity` and `Group`.
