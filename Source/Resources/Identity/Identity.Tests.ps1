@@ -32,10 +32,11 @@ Describe 'Identity Acceptance Tests' {
             $roleAssignment.RoleDefinitionName | Should -Be $role
         }
     }
+
     Context 'Managed Identity <name>' -ForEach $ManagedIdentities {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-            $identity = Get-UserAssignedIdentity -Definition $Definition -Name $name
+            $identity = Get-UserAssignedIdentity -Definition $Definition -Name $name -Context $context
         }
 
         It 'Validate <name> has been created' {
@@ -46,6 +47,7 @@ Describe 'Identity Acceptance Tests' {
             $roleAssignment.RoleDefinitionName | Should -Be $role
         }
     }
+    
     Context 'Group <name>' -ForEach $Groups {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]

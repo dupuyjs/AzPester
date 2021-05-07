@@ -1,3 +1,24 @@
+function Get-Context {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [PSObject] $Definition,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Context
+    )
+
+    $defContexts = $Definition.contexts
+    $curContext = ${defContexts}?[$Context]
+
+    if ($null -ne $curContext) {
+        return $curContext
+    }
+    else {
+        throw "Context $Context is unknown. This context should be referenced in contexts section."
+    }
+}
+
 function Get-UserAssignedIdentity {
     param(
         [Parameter(Mandatory = $true)]
@@ -5,15 +26,28 @@ function Get-UserAssignedIdentity {
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Name
+        [String] $Name,
+        [Parameter(Mandatory = $false)]
+        [String] $Context
     )
 
-    $resourceGroupName = $Definition.contexts.default.resourceGroupName
-    if ([string]::IsNullOrWhiteSpace($resourceGroupName)) {
-        throw 'The default resourceGroupName input value is Null|Empty or WhiteSpace.'
-    }
+    if ($Context) {
+        $curContext = Get-Context -Definition $Definition -Context $Context
 
-    Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName -Name $Name
+        $uami = Get-AzUserAssignedIdentity `
+            -ResourceGroupName $curContext.ResourceGroupName `
+            -Name $Name `
+            -DefaultProfile $curContext.Context
+        return $uami
+    }
+    else {
+        $resourceGroupName = $Definition.contexts.default.ResourceGroupName
+        if ([string]::IsNullOrWhiteSpace($ResourceGroupName)) {
+            throw 'The default context resource group name is Null|Empty or WhiteSpace.'
+        }
+
+        Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName -Name $Name
+    }
 }
 
 function Get-RoleAssignment {
