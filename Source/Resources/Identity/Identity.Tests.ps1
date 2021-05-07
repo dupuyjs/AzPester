@@ -1,8 +1,6 @@
 param (
     [Parameter(Mandatory = $true)]
-    [PSObject] $Definition,
-    [Parameter(Mandatory = $true)]
-    [PSObject] $Contexts
+    [PSObject] $Definition
 )
 
 BeforeDiscovery {
@@ -30,7 +28,7 @@ Describe 'Identity Acceptance Tests' {
             $identity | Should -Not -BeNullOrEmpty
         }
         It 'Validate <name> has <role> role on <scope.displayName> resource' -ForEach $roleAssignments {
-            $roleAssignment = Get-RoleAssignment -Contexts $Contexts -ObjectId $identity.Id -Scope $scope.scope
+            $roleAssignment = Get-RoleAssignment -Definition $Definition -ObjectId $identity.Id -Scope $scope.scope
             $roleAssignment.RoleDefinitionName | Should -Be $role
         }
     }
@@ -44,7 +42,7 @@ Describe 'Identity Acceptance Tests' {
             $identity | Should -Not -BeNullOrEmpty
         }
         It 'Validate <name> has <role> role on <scope.displayName> resource' -ForEach $roleAssignments {
-            $roleAssignment = Get-RoleAssignment -Contexts $Contexts -ObjectId $identity.PrincipalId -Scope $scope.scope
+            $roleAssignment = Get-RoleAssignment -Definition $Definition -ObjectId $identity.PrincipalId -Scope $scope.scope
             $roleAssignment.RoleDefinitionName | Should -Be $role
         }
     }
@@ -58,7 +56,7 @@ Describe 'Identity Acceptance Tests' {
             $identity | Should -Not -BeNullOrEmpty
         }
         It 'Validate <name> has <role> role on <scope.displayName> resource' -ForEach $roleAssignments {
-            $roleAssignment = Get-RoleAssignment -Contexts $Contexts -ObjectId $identity.Id -Scope $scope.scope
+            $roleAssignment = Get-RoleAssignment -Definition $Definition -ObjectId $identity.Id -Scope $scope.scope
             $roleAssignment.RoleDefinitionName | Should -Be $role
         }
     }
