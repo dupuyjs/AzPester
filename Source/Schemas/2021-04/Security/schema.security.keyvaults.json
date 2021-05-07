@@ -1,0 +1,273 @@
+{
+    "id": "schema.security.keyvaults",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Key Vault",
+    "description": "Schema for Key Vault Section",
+    "definitions": {
+        "keyVault": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the key vault."
+                },
+                "location": {
+                    "type": "string",
+                    "description": "(Optional) The location where the key vault has been created."
+                },
+                "enabledForDeployment": {
+                    "type": "boolean",
+                    "description": "(Optional) Property to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault."
+                },
+                "enabledForDiskEncryption": {
+                    "type": "boolean",
+                    "description": "(Optional) Property to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys."
+                },
+                "enabledForTemplateDeployment": {
+                    "type": "boolean",
+                    "description": "(Optional) Property to specify whether Azure Resource Manager is permitted to retrieve secrets from the key vault."
+                },
+                "enablePurgeProtection": {
+                    "type": "boolean",
+                    "description": "(Optional) Property specifying whether protection against purge is enabled for this vault."
+                },
+                "enableRbacAuthorization": {
+                    "type": "boolean",
+                    "description": "(Optional) Property that controls how data actions are authorized. When true, the key vault will use Role Based Access Control (RBAC) for authorization of data actions, and the access policies specified in vault properties will be  ignored (warning: this is a preview feature). When false, the key vault will use the access policies specified in vault properties, and any policy stored on Azure Resource Manager will be ignored. If null or not specified, the vault is created with the default value of false. Note that management actions are always authorized with RBAC."
+                },
+                "enableSoftDelete": {
+                    "type": "boolean",
+                    "description": "(Optional) Property to specify whether the 'soft delete' functionality is enabled for this key vault. If it's not set to any value(true or false) when creating new key vault, it will be set to true by default. Once set to true, it cannot be reverted to false."
+                },
+                "sku": {
+                    "type": "string",
+                    "enum": [
+                        "standard",
+                        "premium"
+                    ],
+                    "description": "(Optional) SKU to specify whether the key vault is a standard vault or a premium vault."
+                },
+                "softDeleteRetentionInDays": {
+                    "type": "integer",
+                    "description": "(Optional) softDelete data retention days. It accepts >=7 and <=90."
+                },
+                "accessPolicies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/accessPolicy"
+                    },
+                    "description": "(Optional) An array of identities that have access to the key vault."
+                },
+                "keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/key"
+                    },
+                    "description": "(Optional) List of keys stored in the key vault."
+                },
+                "secrets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/secret"
+                    },
+                    "description": "(Optional) List of secrets stored in the key vault."
+                },
+                "certificates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/certificate"
+                    },
+                    "description": "(Optional) List of certificates stored in the key vault."
+                }
+            },
+            "additionalProperties": false
+        },
+        "accessPolicy": {
+            "type": "object",
+            "required": [
+                "identity",
+                "permissions"
+            ],
+            "properties": {
+                "identity": {
+                    "$ref": "#/definitions/identity"
+                },
+                "permissions": {
+                    "type": "object",
+                    "properties": {
+                        "keys": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "all",
+                                    "encrypt",
+                                    "decrypt",
+                                    "wrapKey",
+                                    "unwrapKey",
+                                    "sign",
+                                    "verify",
+                                    "get",
+                                    "list",
+                                    "create",
+                                    "update",
+                                    "import",
+                                    "delete",
+                                    "backup",
+                                    "restore",
+                                    "recover",
+                                    "purge"
+                                ]
+                            },
+                            "description": "(Optional) Permissions to keys"
+                        },
+                        "secrets": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "all",
+                                    "get",
+                                    "list",
+                                    "set",
+                                    "delete",
+                                    "backup",
+                                    "restore",
+                                    "recover",
+                                    "purge"
+                                ]
+                            },
+                            "description": "(Optional) Permissions to secrets"
+                        },
+                        "certificates": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "all",
+                                    "get",
+                                    "list",
+                                    "delete",
+                                    "create",
+                                    "import",
+                                    "update",
+                                    "managecontacts",
+                                    "getissuers",
+                                    "listissuers",
+                                    "setissuers",
+                                    "deleteissuers",
+                                    "manageissuers",
+                                    "recover",
+                                    "purge",
+                                    "backup",
+                                    "restore"
+                                ]
+                            },
+                            "description": "(Optional) Permissions to certificates"
+                        },
+                        "storage": {
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "all",
+                                    "get",
+                                    "list",
+                                    "delete",
+                                    "set",
+                                    "update",
+                                    "regeneratekey",
+                                    "recover",
+                                    "purge",
+                                    "backup",
+                                    "restore",
+                                    "setsas",
+                                    "listsas",
+                                    "getsas",
+                                    "deletesas"
+                                ]
+                            },
+                            "description": "(Optional) Permissions to storage"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
+        "identity": {
+            "type": "object",
+            "required": [
+                "name",
+                "type"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The identity name."
+                },
+                "type": {
+                    "type": "string",
+                    "description": "(Required) The identity type.",
+                    "enum": [
+                        "ManagedIdentity",
+                        "ServicePrincipal",
+                        "Group"
+                    ]
+                }
+            },
+            "description": "(Required) Identity definition that has access to the key vault.",
+            "additionalProperties": false
+        },
+        "key": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the key"
+                }
+            },
+            "additionalProperties": false
+        },
+        "secret": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the secret"
+                }
+            },
+            "additionalProperties": false
+        },
+        "certificate": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the certificate."
+                },
+                "thumbprint": {
+                    "type": "string",
+                    "description": "(Optional) The thumbprint of the certificate."
+                },
+                "expirationThresholdInDays": {
+                    "type": "integer",
+                    "description": "(Optional) The threshold in days before certificate expiration date."
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}
