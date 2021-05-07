@@ -34,11 +34,11 @@ function Get-RouteTable {
     if ($Context) {
         $curContext = Get-Context -Definition $Definition -Context $Context
 
-        $virtualNetwork = Get-AzRouteTable `
+        $routeTable = Get-AzRouteTable `
             -ResourceGroupName $curContext.ResourceGroupName `
             -Name $Name `
             -DefaultProfile $curContext.Context
-        return $virtualNetwork
+        return $routeTable
     }
     else {
         $resourceGroupName = $Definition.contexts.default.ResourceGroupName

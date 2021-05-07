@@ -64,11 +64,11 @@ function Get-NetworkSecurityGroup {
 
     if ($Context) {
         $curContext = Get-Context -Definition $Definition -Context $Context
-        $virtualNetwork = Get-AzNetworkSecurityGroup `
+        $nsg = Get-AzNetworkSecurityGroup `
             -ResourceGroupName $curContext.ResourceGroupName `
             -Name $Name `
             -DefaultProfile $curContext.Context
-        return $virtualNetwork
+        return $nsg
     }
     else {
         $resourceGroupName = $Definition.contexts.default.ResourceGroupName
@@ -94,11 +94,11 @@ function Get-RouteTable {
 
     if ($Context) {
         $curContext = Get-Context -Definition $Definition -Context $Context
-        $virtualNetwork = Get-AzRouteTable `
+        $routeTable = Get-AzRouteTable `
             -ResourceGroupName $curContext.ResourceGroupName `
             -Name $Name `
             -DefaultProfile $curContext.Context
-        return $virtualNetwork
+        return $routeTable
     }
     else {
         $resourceGroupName = $Definition.contexts.default.ResourceGroupName
