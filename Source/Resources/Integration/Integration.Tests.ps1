@@ -35,7 +35,7 @@ Describe 'Integration Tests' {
             Write-Information "    [#] Test will be executed from virtual machine $($runner.vm.Id)."
 
             $result = Invoke-CheckResourceAccessCommand -RunnerVmId $runner.vm.Id `
-                -RunnerContext $runner.context `
+                -RunnerContext $runner.contextRef `
                 -Hostname $targetHost `
                 -Port $targetPort `
             

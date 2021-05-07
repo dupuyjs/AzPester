@@ -13,8 +13,10 @@ function Find-Runners{
     # Set default context for runners that don't have explicit context in definition
     foreach ($runner in $runners.GetEnumerator()) {
         if ($null -eq $runner.Value.context) {
-            $runner.Value.context = $Contexts.default
+            $runner.Value.context = "default"
         }
+        
+        $runner.Value.contextRef = $Contexts[$runner.Value.context]
     }
 
     return $runners

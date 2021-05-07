@@ -29,24 +29,24 @@ function New-TestInfrastructure {
     # Creating runners in parallel
     $Runners.GetEnumerator() | ForEach-Object -Parallel {
         $vnet = Get-AzVirtualNetwork -Name $_.Value.vnet `
-            -ResourceGroupName $_.Value.context.resourceGroupName `
-            -DefaultProfile $_.Value.context.Context `
+            -ResourceGroupName $_.Value.contextRef.resourceGroupName `
+            -DefaultProfile $_.Value.contextRef.Context `
             -ErrorVariable vnetDoesNotExist `
             -ErrorAction SilentlyContinue
         
         if ($vnetDoesNotExist) {
-            Write-Error "[#] Virtual Network $($_.Value.vnet) was not found in resource group $($_.Value.context.resourceGroupName) for runner $($_.Key)."
+            Write-Error "[#] Virtual Network $($_.Value.vnet) was not found in resource group $($_.Value.contextRef.resourceGroupName) for runner $($_.Key)."
             Continue
         }
 
         $subnet = Get-AzVirtualNetworkSubnetConfig -Name $_.Value.subnet `
             -VirtualNetwork $vnet `
-            -DefaultProfile $_.Value.context.Context `
+            -DefaultProfile $_.Value.contextRef.Context `
             -ErrorVariable subnetDoesNotExist `
             -ErrorAction SilentlyContinue
         
         if ($subnetDoesNotExist) {
-            Write-Error "[#] Subnet $($_.Value.subnet) was not found in virtual network $($_.Value.vnet) in resource group $($_.Value.context.resourceGroupName) for runner $($_.Key)."
+            Write-Error "[#] Subnet $($_.Value.subnet) was not found in virtual network $($_.Value.vnet) in resource group $($_.Value.contextRef.resourceGroupName) for runner $($_.Key)."
             Continue
         }
 
