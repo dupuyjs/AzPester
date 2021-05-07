@@ -7,7 +7,6 @@ function Invoke-AzPester {
         [String] $Parameters
     )
 
-    $definitionWithParameters = $null
     $isValidSchemas = Assert-Schemas -Definition $Definition -Parameters $Parameters
 
     if ($isValidSchemas) {
@@ -15,12 +14,14 @@ function Invoke-AzPester {
 
         if ($isValidParameters) {
             $definitionWithParameters = Set-Parameters -Definition $Definition -Parameters $Parameters
+            # Getting contexts and assigning them to the definition
             $contexts = Get-Contexts -Definition $definitionWithParameters
+            $definitionWithParameters.definition.contexts = $contexts
 
             # Switching on default subscription
             Set-AzContext -Context $contexts["default"].Context
 
-            $container = New-PesterContainer -Path '*' -Data @{ Definition = $definitionWithParameters.definition; Contexts = $contexts }
+            $container = New-PesterContainer -Path '*' -Data @{ Definition = $definitionWithParameters.definition }
             Invoke-Pester -Container $container -Output 'Detailed'
         }
     }
@@ -180,9 +181,10 @@ function Get-Contexts {
 
     ForEach ($context in $Definition.contexts.GetEnumerator()) {
         $subscriptionId = $context.value.subscriptionId
-        Write-Host $subscriptionId
-        $subscriptionContext = Get-AzSubscription -SubscriptionId $subscriptionId | Set-AzContext
         $contextName = $context.key
+
+        Write-Host "$subscriptionId ($contextName)" 
+        $subscriptionContext = Get-AzSubscription -SubscriptionId $subscriptionId | Set-AzContext
         $resourceGroupName = $context.value.resourceGroupName
         $contexts.Add($contextName, @{
                 Name              = $contextName
