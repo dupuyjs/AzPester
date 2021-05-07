@@ -1,38 +1,51 @@
+function Get-Context {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [PSObject] $Definition,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Context
+    )
+
+    $defContexts = $Definition.contexts
+    $curContext = ${defContexts}?[$Context]
+
+    if ($null -ne $curContext) {
+        return $curContext
+    }
+    else {
+        throw "Context $Context is unknown. This context should be referenced in contexts section."
+    }
+}
+
 function Get-RouteTable {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts,
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name,
         [Parameter(Mandatory = $false)]
-        [String] $SubscriptionId,
-        [Parameter(Mandatory = $false)]
-        [String] $ResourceGroupName
+        [String] $Context
     )
 
-    if(!$ResourceGroupName) {
-        $ResourceGroupName = $Contexts.default.resourceGroupName
+    if ($Context) {
+        $curContext = Get-Context -Definition $Definition -Context $Context
+
+        $virtualNetwork = Get-AzRouteTable `
+            -ResourceGroupName $curContext.ResourceGroupName `
+            -Name $Name `
+            -DefaultProfile $curContext.Context
+        return $virtualNetwork
+    }
+    else {
+        $resourceGroupName = $Definition.contexts.default.ResourceGroupName
         if ([string]::IsNullOrWhiteSpace($ResourceGroupName)) {
-            throw 'The default resourceGroupName input value is Null|Empty or WhiteSpace.'
-        }
-    }
-
-    if($SubscriptionId) {
-        ForEach ($context in $Contexts.GetEnumerator()) {
-            if ($context.Value.SubscriptionId -eq $SubscriptionId) {
-                # Get network security group
-                $nsg = Get-AzRouteTable -ResourceGroupName $ResourceGroupName -Name $Name -DefaultProfile $context.Value.Context
-                return $nsg 
-            }
+            throw 'The default context resource group name is Null|Empty or WhiteSpace.'
         }
 
-        Write-Host "Warning: Subscription $SubscriptionId is unknown. This subscription should be referenced in contexts." -ForegroundColor Yellow
+        Get-AzRouteTable -ResourceGroupName $resourceGroupName -Name $Name
     }
-
-    Get-AzRouteTable -ResourceGroupName $resourceGroupName -Name $Name
 }
