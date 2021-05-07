@@ -10,7 +10,7 @@ BeforeDiscovery {
 }
 
 BeforeAll { 
-    . $PSScriptRoot/NetworkSecurityGroup.ps1
+    . $PSScriptRoot/../Network.ps1
 }
 
 Describe 'Network Security Group <name> Acceptance Tests' -ForEach $NetworkSecurityGroups {

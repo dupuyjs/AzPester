@@ -1,25 +1,7 @@
-function Get-Context {
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Definition,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String] $Context
-    )
+. $PSScriptRoot/../Common/Common.ps1
+. $PSScriptRoot/../Identity/Identity.ps1
 
-    $defContexts = $Definition.contexts
-    $curContext = ${defContexts}?[$Context]
-
-    if ($null -ne $curContext) {
-        return $curContext
-    }
-    else {
-        throw "Context $Context is unknown. This context should be referenced in contexts section."
-    }
-}
-
-function Get-VirtualNetwork {
+function Get-KeyVault {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
@@ -34,11 +16,11 @@ function Get-VirtualNetwork {
     if ($Context) {
         $curContext = Get-Context -Definition $Definition -Context $Context
 
-        $virtualNetwork = Get-AzVirtualNetwork `
+        $keyVault = Get-AzKeyVault `
             -ResourceGroupName $curContext.ResourceGroupName `
-            -Name $Name `
+            -VaultName $Name `
             -DefaultProfile $curContext.Context
-        return $virtualNetwork
+        return $keyVault
     }
     else {
         $resourceGroupName = $Definition.contexts.default.ResourceGroupName
@@ -46,15 +28,18 @@ function Get-VirtualNetwork {
             throw 'The default context resource group name is Null|Empty or WhiteSpace.'
         }
 
-        Get-AzVirtualNetwork -ResourceGroupName $resourceGroupName -Name $Name
+        Get-AzKeyVault -ResourceGroupName $resourceGroupName -VaultName $Name
     }
 }
 
-function Get-NetworkSecurityGroup {
+function Get-KeyVaultSecret {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [PSObject] $Definition,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $VaultName,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name,
@@ -64,11 +49,12 @@ function Get-NetworkSecurityGroup {
 
     if ($Context) {
         $curContext = Get-Context -Definition $Definition -Context $Context
-        $nsg = Get-AzNetworkSecurityGroup `
-            -ResourceGroupName $curContext.ResourceGroupName `
+
+        $secret = Get-AzKeyVaultSecret `
+            -VaultName $VaultName `
             -Name $Name `
             -DefaultProfile $curContext.Context
-        return $nsg
+        return $secret
     }
     else {
         $resourceGroupName = $Definition.contexts.default.ResourceGroupName
@@ -76,15 +62,18 @@ function Get-NetworkSecurityGroup {
             throw 'The default context resource group name is Null|Empty or WhiteSpace.'
         }
 
-        Get-AzNetworkSecurityGroup -ResourceGroupName $resourceGroupName -Name $Name
+        Get-AzKeyVaultSecret -VaultName $VaultName -Name $Name
     }
 }
 
-function Get-RouteTable {
+function Get-KeyVaultKey {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [PSObject] $Definition,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $VaultName,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name,
@@ -94,11 +83,12 @@ function Get-RouteTable {
 
     if ($Context) {
         $curContext = Get-Context -Definition $Definition -Context $Context
-        $routeTable = Get-AzRouteTable `
-            -ResourceGroupName $curContext.ResourceGroupName `
+
+        $key = Get-AzKeyVaultKey `
+            -VaultName $VaultName `
             -Name $Name `
             -DefaultProfile $curContext.Context
-        return $routeTable
+        return $key
     }
     else {
         $resourceGroupName = $Definition.contexts.default.ResourceGroupName
@@ -106,6 +96,40 @@ function Get-RouteTable {
             throw 'The default context resource group name is Null|Empty or WhiteSpace.'
         }
 
-        Get-AzRouteTable -ResourceGroupName $resourceGroupName -Name $Name
+        Get-AzKeyVaultKey -VaultName $VaultName -Name $Name
+    }
+}
+
+function Get-KeyVaultCertificate {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNull()]
+        [PSObject] $Definition,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $VaultName,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Name,
+        [Parameter(Mandatory = $false)]
+        [String] $Context
+    )
+
+    if ($Context) {
+        $curContext = Get-Context -Definition $Definition -Context $Context
+
+        $certificate = Get-AzKeyVaultCertificate `
+            -VaultName $VaultName `
+            -Name $Name `
+            -DefaultProfile $curContext.Context
+        return $certificate
+    }
+    else {
+        $resourceGroupName = $Definition.contexts.default.ResourceGroupName
+        if ([string]::IsNullOrWhiteSpace($ResourceGroupName)) {
+            throw 'The default context resource group name is Null|Empty or WhiteSpace.'
+        }
+
+        Get-AzKeyVaultCertificate -VaultName $VaultName -Name $Name
     }
 }

@@ -10,7 +10,7 @@ BeforeDiscovery {
 }
 
 BeforeAll { 
-    . $PSScriptRoot/RouteTable.ps1
+    . $PSScriptRoot/../Network.ps1
 }
 
 Describe 'Route Table <name> Acceptance Tests' -ForEach $RouteTables {

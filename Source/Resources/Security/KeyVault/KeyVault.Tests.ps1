@@ -10,7 +10,7 @@ BeforeDiscovery {
 }
 
 BeforeAll { 
-    . $PSScriptRoot/keyVault.ps1
+    . $PSScriptRoot/../Security.ps1
 }
 
 Describe 'Key Vault <name> Acceptance Tests' -ForEach $KeyVaults {

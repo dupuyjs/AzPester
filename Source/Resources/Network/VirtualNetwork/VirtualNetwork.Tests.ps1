@@ -10,7 +10,7 @@ BeforeDiscovery {
 }
 
 BeforeAll { 
-    . $PSScriptRoot/VirtualNetwork.ps1
+    . $PSScriptRoot/../Network.ps1
 }
 
 Describe 'Virtual Network <name> Acceptance Tests' -ForEach $VirtualNetworks {

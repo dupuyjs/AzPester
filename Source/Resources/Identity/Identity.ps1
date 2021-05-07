@@ -1,21 +1,44 @@
-function Get-Context {
+. $PSScriptRoot/../Common/Common.ps1
+
+class IdentityTypes {
+    static [string] $ServicePrincipal = 'ServicePrincipal'
+    static [string] $ManagedIdentity = 'ManagedIdentity'
+    static [string] $Group = 'Group'
+}
+
+function Get-IdentityTypes {
+    return [IdentityTypes]::new()
+}
+
+function Get-IdentityObjectId {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
+        [String] $Type,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $Name,
+        [Parameter(Mandatory = $false)]
         [String] $Context
     )
 
-    $defContexts = $Definition.contexts
-    $curContext = ${defContexts}?[$Context]
-
-    if ($null -ne $curContext) {
-        return $curContext
+    if($Type -eq (Get-IdentityTypes)::ServicePrincipal) {
+        $identity = Get-AzADServicePrincipal -DisplayName $name
+        return $identity.Id
+    }
+    elseif($Type -eq (Get-IdentityTypes)::ManagedIdentity) {
+        $identity = Get-UserAssignedIdentity -Definition $Definition -Name $Name -Context $Context
+        return $identity.PrincipalId
+    }
+    elseif($Type -eq (Get-IdentityTypes)::Group) {
+        $identity = Get-AzADGroup -DisplayName $name
+        return $identity.Id
     }
     else {
-        throw "Context $Context is unknown. This context should be referenced in contexts section."
+        Write-Host "Issue: Type $Type used by Get-IdentityObjectId is not supported." -ForegroundColor Red
     }
 }
 
