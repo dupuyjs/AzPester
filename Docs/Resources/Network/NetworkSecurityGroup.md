@@ -120,9 +120,16 @@
 
 ### networkSecurityGroup object
 
-- `name` (Required) The name of the network security group.
+- `name`: (Required) The name of the network security group.
   - Type: string
-- `location` (Optional) The location/region where the network security group has been created.
+- `context`: (Optional) The context name used for this resource. default context used if not specified.
+  - Type: string
+
+Note: You can target a subscription different than default one by using `context` property. However, you have to reference the associated subscription identifier and resource group name in the `contexts` section.
+
+For more details about contexts, please read the [REAME.md](../../../README.md) file.
+
+- `location`: (Optional) The location/region where the network security group has been created.
   - Type: string
 - `securityRules`: (Optional) An array of `securityRule` objects.
   - Type: securityRule[]
