@@ -1,11 +1,9 @@
+. $PSScriptRoot/../../Common/Common.ps1
 function Find-Runners{
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [PSObject] $Definition,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts
+        [PSObject] $Definition
     )
 
     $runners = $Definition.integration.runners
@@ -16,7 +14,7 @@ function Find-Runners{
             $runner.Value.context = "default"
         }
         
-        $runner.Value.contextRef = $Contexts[$runner.Value.context]
+        $runner.Value.contextRef = Get-Context -Definition $Definition -Context $runner.Value.context
     }
 
     return $runners
@@ -26,17 +24,14 @@ function Find-ResourceAccessChecks{
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [PSObject] $Definition,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts
+        [PSObject] $Definition
     )
 
     $resourceAccessChecks = $Definition.integration.resourceAccessChecks
 
     # resolve runner reference for each resource access check
     foreach ($resourceAccessCheck in $resourceAccessChecks) {
-        [System.Collections.Hashtable]$allRunners = Find-Runners -Definition $Definition -Contexts $Contexts
+        [System.Collections.Hashtable]$allRunners = Find-Runners -Definition $Definition
         [System.Collections.ArrayList]$runnerRefs = @()
 
         foreach ($runnerKey in $resourceAccessCheck.runFrom) {

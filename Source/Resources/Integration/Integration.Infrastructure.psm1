@@ -16,6 +16,8 @@ function New-TestInfrastructure {
         -ErrorVariable rgDoesNotExist `
         -ErrorAction SilentlyContinue
 
+    Write-Host "[#] Begin creation of the test runners. It can take a few minutes..."
+
     # Create the group if it does not existZ
     if ($rgDoesNotExist) {
         Write-Information "[#] Creating new resource group $($TestDeploymentInfo.resourceGroupName) in $($TestDeploymentInfo.location) for runners..."
@@ -113,6 +115,8 @@ function New-TestInfrastructure {
         Write-Information "[#] Virtual machine $($vm.Id) is ready."
         $_.Value.vm = $vm
     }
+
+    Write-Host "[#] Creation of the test runners ended."
 }
 
 function Remove-TestInfrastructure {

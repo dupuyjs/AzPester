@@ -1,23 +1,21 @@
 param (
     [Parameter(Mandatory = $true)]
-    [PSObject] $Definition,
-    [Parameter(Mandatory = $true)]
-    [PSObject] $Contexts
+    [PSObject] $Definition
 )
 
 BeforeDiscovery {
     Import-Module -Force $PSScriptRoot/Parsers/Definition.psm1
     Import-Module -Force $PSScriptRoot/Integration.Infrastructure.psm1
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-    $ResourceAccessChecks = Find-ResourceAccessChecks -Definition $Definition -Contexts $Contexts
+    $ResourceAccessChecks = Find-ResourceAccessChecks -Definition $Definition
 }
 
 Describe 'Integration Tests' {
     BeforeAll {
         # Deploy testing infrastructure according to integration tests definition file.
         $TestDeploymentInfo = Find-TestDeploymentInfo -Definition $Definition
-        $Runners = Find-Runners -Definition $Definition -Contexts $Contexts
-        New-TestInfrastructure -TestDeploymentInfo $TestDeploymentInfo -Runners $Runners -Contexts $Contexts
+        $Runners = Find-Runners -Definition $Definition
+        New-TestInfrastructure -TestDeploymentInfo $TestDeploymentInfo -Runners $Runners -Contexts $Definition.contexts
     }
 
     AfterAll {
