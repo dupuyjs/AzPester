@@ -42,6 +42,13 @@
 
 - `name`: (Required) The identity name.
   - Type: string
+- `context`: (Optional) The context name used for this resource. default context used if not specified. Used only if type is `ManagedIdentity`.
+  - Type: string
+
+Note: You can target a subscription different than default one by using `context` property. However, you have to reference the associated subscription identifier and resource group name in the `contexts` section.
+
+For more details about contexts, please read the [REAME.md](../../../README.md) file.
+
 - `type`: (Required) The identity type.
   - Type: string
   - Valid Values: `ServicePrincipal`, `ManagedIdentity` and `Group`.
@@ -68,7 +75,7 @@ Note: If there is no role assignments, we are just evaluating if the identity ex
 
 Note: In scope property, you can target a subsription different than default one. We will automatically detect the subscription and switch to the appropriate context.
 
-Anyway, you have to reference this subscription identifier in the `contexts` section. If not, the following warning will be displayed:
+However, th subscription identifier should be listed in `contexts` section. If not, the following warning will be displayed:
 
 ```powershell
 "Warning: Subscription $scopeSubscriptionId is unknown. This subscription should be referenced in contexts."

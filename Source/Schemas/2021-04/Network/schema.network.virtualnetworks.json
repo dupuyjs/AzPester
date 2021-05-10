@@ -14,6 +14,10 @@
                     "type": "string",
                     "description": "(Required) The name of the virtual network."
                 },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The context name used for this resource."
+                },
                 "location": {
                     "type": "string",
                     "description": "(Optional) The location/region where the virtual network has been created."
@@ -147,13 +151,9 @@
                     "type": "string",
                     "description": "(Required) The remote virtual network name."
                 },
-                "subscriptionId": {
+                "context": {
                     "type": "string",
-                    "description": "(Optional) The subscription identifier where is located the remote virtual network."
-                },
-                "resourceGroupName": {
-                    "type": "string",
-                    "description": "(Optional) The resource group name where is located the remote virtual network."
+                    "description": "(Optional) The context name used for this resource."
                 }
             },
             "additionalProperties": false
@@ -168,13 +168,9 @@
                     "type": "string",
                     "description": "(Required) The network security group name."
                 },
-                "subscriptionId": {
+                "context": {
                     "type": "string",
-                    "description": "(Optional) The subscription identifier where is located the network security group."
-                },
-                "resourceGroupName": {
-                    "type": "string",
-                    "description": "(Optional) The resource group name where is located the network security group."
+                    "description": "(Optional) The context name used for this resource."
                 }
             },
             "additionalProperties": false
@@ -189,13 +185,9 @@
                     "type": "string",
                     "description": "(Required) The route table name."
                 },
-                "subscriptionId": {
+                "context": {
                     "type": "string",
-                    "description": "(Optional) The subscription identifier where is located the route table."
-                },
-                "resourceGroupName": {
-                    "type": "string",
-                    "description": "(Optional) The resource group name where is located the route table."
+                    "description": "(Optional) The context name used for this resource."
                 }
             },
             "additionalProperties": false

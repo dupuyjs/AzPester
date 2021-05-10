@@ -14,6 +14,10 @@
                     "type": "string",
                     "description": "(Required) The name of the key vault."
                 },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The context name used for this resource."
+                },
                 "location": {
                     "type": "string",
                     "description": "(Optional) The location where the key vault has been created."
@@ -217,6 +221,10 @@
                         "ServicePrincipal",
                         "Group"
                     ]
+                },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The context name used for this resource. Used only if type is ManagedIdentity."
                 }
             },
             "description": "(Required) Identity definition that has access to the key vault.",

@@ -1,8 +1,6 @@
 param (
     [Parameter(Mandatory = $true)]
-    [PSObject] $Definition,
-    [Parameter(Mandatory = $true)]
-    [PSObject] $Contexts
+    [PSObject] $Definition
 )
 
 BeforeDiscovery {
@@ -12,13 +10,13 @@ BeforeDiscovery {
 }
 
 BeforeAll { 
-    . $PSScriptRoot/RouteTable.ps1
+    . $PSScriptRoot/../Network.ps1
 }
 
 Describe 'Route Table <name> Acceptance Tests' -ForEach $RouteTables {
     BeforeAll {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-        $routeTable = Get-RouteTable -Definition $Definition -Contexts $Contexts -Name $name
+        $routeTable = Get-RouteTable -Definition $Definition -Name $name -Context $context
     }
 
     Context 'Route Table <name>' {

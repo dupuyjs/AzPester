@@ -158,7 +158,7 @@ This section has another purpose. Some resources need to switch to a different s
 
 So, to avoid performance loss, we are loading all contexts just once before invoking tests. These contexts are passed to all Pester tests and reused as needed when a context switch is detected.
 
-So if you target a specific subscription (as required in the documentation of the associated resource), you need to reference the associated `subscriptionId` as declared below:
+If you need to target a specific subscription when declaring a resource (different than default one), you can reference one of these contexts by using the associated `context` property.
 
 ```json
 "contexts": {
@@ -168,11 +168,24 @@ So if you target a specific subscription (as required in the documentation of th
     },
     "dns": {
         "subscriptionId": "{parameters.dnsSubscriptionId}",
+        "resourceGroupName": "{parameters.dnsResourceGroupName}"
     }
 }
 ```
 
-Additional contexts don't need to reference a `resourceGroupName`.
+```json
+"definition": {
+    "network": {
+        "routeTables": [
+            {
+                "name": "{parameters.routeTable.name}",
+                "context": "dns",
+                "location": "{parameters.location}",
+            }
+        ]
+    }
+}
+```
 
 ## Resources
 

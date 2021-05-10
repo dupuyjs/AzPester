@@ -31,6 +31,13 @@
 
 - `name`: (Required) The name of the route table.
   - Type: string
+- `context`: (Optional) The context name used for this resource. default context used if not specified.
+  - Type: string
+
+Note: You can target a subscription different than default one by using `context` property. However, you have to reference the associated subscription identifier and resource group name in the `contexts` section.
+
+For more details about contexts, please read the [REAME.md](../../../README.md) file.
+
 - `location`: (Optional) The location of the route table.
   - Type: string
 - `routes`: (Optional) List of all routes. Contains an array of `route` objects.

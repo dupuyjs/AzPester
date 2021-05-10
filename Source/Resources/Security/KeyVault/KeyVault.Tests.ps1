@@ -1,8 +1,6 @@
 param (
     [Parameter(Mandatory = $true)]
-    [PSObject] $Definition,
-    [Parameter(Mandatory = $true)]
-    [PSObject] $Contexts
+    [PSObject] $Definition
 )
 
 BeforeDiscovery {
@@ -12,13 +10,13 @@ BeforeDiscovery {
 }
 
 BeforeAll { 
-    . $PSScriptRoot/keyVault.ps1
+    . $PSScriptRoot/../Security.ps1
 }
 
 Describe 'Key Vault <name> Acceptance Tests' -ForEach $KeyVaults {
     BeforeAll {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-        $keyVault = Get-KeyVault -Definition $Definition -Contexts $Contexts -Name $name
+        $keyVault = Get-KeyVault -Definition $Definition -Name $name -Context $context
     }
 
     Context 'Key Vault <name>'{
@@ -35,7 +33,7 @@ Describe 'Key Vault <name> Acceptance Tests' -ForEach $KeyVaults {
     Context 'Access Policies for <identity.name>' -ForEach $accessPolicies {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-            $objectId = Get-IdentityObjectId -Definition $Definition -Type $identity.type -Name $identity.name
+            $objectId = Get-IdentityObjectId -Definition $Definition -Type $identity.type -Name $identity.name -Context $identity.context
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
             $policy = $keyVault.AccessPolicies | Where-Object {$_.ObjectId -eq $objectId}
         }
@@ -54,7 +52,7 @@ Describe 'Key Vault <name> Acceptance Tests' -ForEach $KeyVaults {
     Context 'Key <name>' -ForEach $keys {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-            $key = Get-KeyVaultKey -Definition $Definition -Contexts $Contexts -VaultName $keyVault.VaultName -Name $name
+            $key = Get-KeyVaultKey -Definition $Definition -VaultName $keyVault.VaultName -Name $name -Context $context
         }
 
         It 'Validate key is Enabled' {
@@ -67,7 +65,7 @@ Describe 'Key Vault <name> Acceptance Tests' -ForEach $KeyVaults {
     Context 'Secret <name>' -ForEach $secrets {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-            $secret = Get-KeyVaultSecret -Definition $Definition -Contexts $Contexts -VaultName $keyVault.VaultName -Name $name
+            $secret = Get-KeyVaultSecret -Definition $Definition -VaultName $keyVault.VaultName -Name $name -Context $context
         }
 
         It 'Validate secret is Enabled'  {
@@ -80,7 +78,7 @@ Describe 'Key Vault <name> Acceptance Tests' -ForEach $KeyVaults {
     Context 'Certificate <name>' -ForEach $certificates {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-            $certificate = Get-KeyVaultCertificate -Definition $Definition -Contexts $Contexts -VaultName $keyVault.VaultName -Name $name
+            $certificate = Get-KeyVaultCertificate -Definition $Definition -VaultName $keyVault.VaultName -Name $name -Context $context
         }
 
         It 'Validate certificate is Enabled'  {
