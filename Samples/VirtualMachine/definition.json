@@ -1,0 +1,38 @@
+{
+    "$schema": "../../Source/Schemas/2021-04/schema.definition.json",
+    "contentVersion": "1.0.0.0",
+    "contexts": {
+        "default": {
+            "subscriptionId": "{parameters.subscriptionId}",
+            "resourceGroupName": "{parameters.resourceGroupName}"
+        },
+        "gallery": {
+            "subscriptionId": "{parameters.subscriptionId}",
+            "resourceGroupName": "rg-ms360-tests-sig"
+        }
+    },
+    "definition": {
+        "compute": {
+            "virtualMachines": [
+                {
+                    "name": "{parameters.vmName}",
+                    "location": "{parameters.location}",
+                    "vmSize": "{parameters.vmSize}",
+                    "imageReference": {
+                        "gallery": "{parameters.imageGalleryName}",
+                        "name": "{parameters.imageName}",
+                        "version": "{parameters.imageVersion}",
+                        "context": "gallery"
+                    },
+                    "networkProfile": {
+                        "virtualNetwork": "{parameters.virtualNetwork}",
+                        "subnet": "{parameters.subnet}"
+                    },
+                    "autoShutdownDailyRecurrence": "{parameters.autoShutdownTime}",
+                    "autoShutdownTimeZone": "{parameters.autoShutdownTimeZone}",
+                    "userAssignedIdentity": "{parameters.userAssignedIdentity}"
+                }
+            ]
+        }
+    }
+}
