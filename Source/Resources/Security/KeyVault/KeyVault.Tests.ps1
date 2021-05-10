@@ -13,7 +13,7 @@ BeforeAll {
     . $PSScriptRoot/../Security.ps1
 }
 
-Describe 'Key Vault <name> Acceptance Tests' -ForEach $KeyVaults {
+Describe 'Key Vault <name> Acceptance Tests' -Tag 'Security' -ForEach $KeyVaults {
     BeforeAll {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
         $keyVault = Get-KeyVault -Definition $Definition -Name $name -Context $context

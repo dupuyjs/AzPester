@@ -13,7 +13,7 @@ BeforeAll {
     . $PSScriptRoot/../Network.ps1
 }
 
-Describe 'Network Security Group <name> Acceptance Tests' -ForEach $NetworkSecurityGroups {
+Describe 'Network Security Group <name> Acceptance Tests' -Tag 'Network' -ForEach $NetworkSecurityGroups {
     BeforeAll {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
         $networkSecurityGroup = Get-NetworkSecurityGroup -Definition $Definition -Name $name -Context $context
