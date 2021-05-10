@@ -1,8 +1,6 @@
 param (
     [Parameter(Mandatory = $true)]
-    [PSObject] $Definition,
-    [Parameter(Mandatory = $true)]
-    [PSObject] $Contexts
+    [PSObject] $Definition
 )
 
 BeforeDiscovery {
@@ -18,7 +16,7 @@ BeforeAll {
 Describe 'Virtual Machine <name> Acceptance Tests' -ForEach $VirtualMachines {
     BeforeAll {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-        $vm = Get-VirtualMachine -Definition $Definition -Contexts $Contexts -Name $_.name
+        $vm = Get-VirtualMachine -Definition $Definition -Name $_.name
     }
 
     Context 'Virtual Machine <name>' {
@@ -35,7 +33,7 @@ Describe 'Virtual Machine <name> Acceptance Tests' -ForEach $VirtualMachines {
         if ($_.imageReference) {
             It 'Validate virtual machine <name> has the expected image reference' {
                 if ($_.imageReference.gallery) {
-                    $image = Get-GalleryImage -Definition $Definition -Contexts $Contexts -GalleryName $_.imageReference.gallery -ImageName $_.imageReference.name -ImageVersion $_.imageReference.version -Context $_.imageReference.context
+                    $image = Get-GalleryImage -Definition $Definition -GalleryName $_.imageReference.gallery -ImageName $_.imageReference.name -ImageVersion $_.imageReference.version -Context $_.imageReference.context
                     $image | Should -Not -BeNullOrEmpty
                     $vm.StorageProfile.ImageReference.Id | Should -Be $image.Id
                 } elseif ($_.imageReference.publisher) {
@@ -48,7 +46,7 @@ Describe 'Virtual Machine <name> Acceptance Tests' -ForEach $VirtualMachines {
 
         if ($_.networkProfile) {
             It 'Validate virtual machine <name> has the expected network profile' {
-                $vmSubnets = Get-VirtualMachineSubnets -Definition $Definition -Contexts $Contexts -Name $_.name
+                $vmSubnets = Get-VirtualMachineSubnets -Definition $Definition -Name $_.name
 
                 $expectedVnet = $_.networkProfile.virtualNetwork
                 $expectedSubnet = $_.networkProfile.subnet
@@ -63,7 +61,7 @@ Describe 'Virtual Machine <name> Acceptance Tests' -ForEach $VirtualMachines {
 
         if ($_.autoShutdownDailyRecurrence -and $_.autoShutdownTimeZone) {
             It 'Validate virtual machine <name> has the expected auto shutdown settings' {
-                $scheduleProperties = Get-ScheduleProperties -Definition $Definition -Contexts $Contexts -TargetResourceId $vm.Id
+                $scheduleProperties = Get-ScheduleProperties -Definition $Definition -TargetResourceId $vm.Id
                 $shutdownDailyRecurrence = $_.autoShutdownDailyRecurrence
 
                 $scheduleProperties.taskType | Should -Be 'ComputeVmShutdownTask'
@@ -75,7 +73,7 @@ Describe 'Virtual Machine <name> Acceptance Tests' -ForEach $VirtualMachines {
 
         if ($_.userAssignedIdentity) {
             It 'Validate virtual machine <name> has the expected User Assigned Managed Identity' {
-                $identity = Get-UserAssignedIdentity -Definition $Definition -Contexts $Contexts -IdentityName $_.userAssignedIdentity
+                $identity = Get-UserAssignedIdentity -Definition $Definition -IdentityName $_.userAssignedIdentity
 
                 $identity | Should -Not -BeNullOrEmpty
                 $vm.Identity.UserAssignedIdentities.Keys | Should -Contain $identity.Id

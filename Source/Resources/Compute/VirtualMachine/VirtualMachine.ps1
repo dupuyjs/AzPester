@@ -1,18 +1,17 @@
+. $PSScriptRoot/../../Common/Common.ps1
+
 function Get-VirtualMachine {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts,
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name
     )
 
-    $contextObject = $Contexts.default.Context
-    $ResourceGroupName = $Contexts.default.resourceGroupName
+    $contextObject = $Definition.contexts.default
+    $ResourceGroupName = $contextObject.ResourceGroupName
 
     Get-AzVM -ResourceGroupName $ResourceGroupName -Name $Name -DefaultProfile $contextObject.Value.Context
 }
@@ -23,19 +22,16 @@ function Get-VirtualMachineSubnets {
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts,
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $Name
     )
 
     $subnets = @()
 
-    $contextObject = $Contexts.default.Context
-    $ResourceGroupName = $Contexts.default.resourceGroupName
+    $contextObject = $Definition.contexts.default
+    $ResourceGroupName = $contextObject.ResourceGroupName
 
-    $vm = Get-VirtualMachine -Definition $Definition -Contexts $Contexts -Name $Name
+    $vm = Get-VirtualMachine -Definition $Definition -Name $Name
 
     ForEach ($nicReference in $vm.NetworkProfile.NetworkInterfaces) {
         $nicName = $nicReference.Id.Split('/')[-1]
@@ -57,9 +53,6 @@ function Get-GalleryImage {
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts,
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $GalleryName,
         [Parameter(Mandatory = $true)]
@@ -72,11 +65,11 @@ function Get-GalleryImage {
         [String] $Context
     )
 
-    $contextObject = $Contexts.default.Context
-    $resourceGroupName = $Contexts.default.ResourceGroupName
+    $contextObject = $Definition.contexts.default
+    $ResourceGroupName = $contextObject.ResourceGroupName
 
     if ($Context) {
-        $contextObject = $Contexts[$Context]
+        $contextObject = Get-Context -Definition $Definition -Context $Context
         $resourceGroupName = $contextObject.ResourceGroupName
     }
 
@@ -93,15 +86,12 @@ function Get-UserAssignedIdentity {
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts,
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $IdentityName
     )
 
-    $contextObject = $Contexts.default.Context
-    $resourceGroupName = $Contexts.default.ResourceGroupName
+    $contextObject = $Definition.contexts.default
+    $ResourceGroupName = $contextObject.ResourceGroupName
     
     Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName -Name $IdentityName -DefaultProfile $contextObject.Value.Context
 }
@@ -112,15 +102,12 @@ function Get-ScheduleProperties {
         [ValidateNotNull()]
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Contexts,
-        [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $TargetResourceId
     )
 
-    $contextObject = $Contexts.default.Context
-    $resourceGroupName = $Contexts.default.ResourceGroupName
+    $contextObject = $Definition.contexts.default
+    $ResourceGroupName = $contextObject.ResourceGroupName
 
     $schedules = (Get-AzResource -ResourceGroupName $resourceGroupName -DefaultProfile $contextObject.Value.Context -ResourceType Microsoft.DevTestLab/schedules -ExpandProperties).Properties
     $schedules | Where-Object targetResourceId -eq $TargetResourceId 
