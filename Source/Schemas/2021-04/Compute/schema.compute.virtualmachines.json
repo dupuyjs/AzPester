@@ -19,7 +19,7 @@
                     "description": "(Optional) Resource location"
                 },
                 "vmSize": {
-                    "type": "string",        
+                    "type": "string",
                     "description": "(Optional) Specifies the size of the virtual machine."
                 },
                 "imageReference": {
@@ -31,13 +31,8 @@
                 "userAssignedIdentity": {
                     "$ref": "#/definitions/userAssignedIdentity"
                 },
-                "autoShutdownDailyRecurrence": {
-                    "type": "string",
-                    "description": "(Optional) The time of day the schedule will occur."
-                },
-                "autoShutdownTimeZone": {
-                    "type": "string",
-                    "description": "(Optional) The time zone ID (e.g. Pacific Standard time)."
+                "autoShutdown": {
+                    "$ref": "#/definitions/autoShutdown"
                 }
             }
         },
@@ -46,7 +41,9 @@
                 {
                     "type": "object",
                     "required": [
-                        "gallery", "name", "version"
+                        "gallery",
+                        "name",
+                        "version"
                     ],
                     "properties": {
                         "gallery": {
@@ -63,14 +60,17 @@
                         },
                         "context": {
                             "type": "string",
-                            "description": "(Optional) The name of the Azure context to use to resolve the gallery." 
+                            "description": "(Optional) The name of the Azure context to use to resolve the gallery."
                         }
                     }
                 },
                 {
                     "type": "object",
                     "required": [
-                        "publisher", "offer", "sku", "version"
+                        "publisher",
+                        "offer",
+                        "sku",
+                        "version"
                     ],
                     "properties": {
                         "publisher": {
@@ -97,7 +97,8 @@
         "networkProfile": {
             "type": "object",
             "required": [
-                "virtualNetwork", "subnet"
+                "virtualNetwork",
+                "subnet"
             ],
             "properties": {
                 "virtualNetwork": {
@@ -114,6 +115,24 @@
         "userAssignedIdentity": {
             "type": "string",
             "description": "(Optional) The User Assigned Managed Identity name."
+        },
+        "autoShutdown": {
+            "type": "object",
+            "required": [
+                "dailyRecurrence",
+                "timeZone"
+            ],
+            "properties": {
+                "dailyRecurrence": {
+                    "type": "string",
+                    "description": "(Required) The time of day the schedule will occur."
+                },
+                "timeZone": {
+                    "type": "string",
+                    "description": "(Required) The time zone ID (e.g. Pacific Standard time)."
+                }
+            },
+            "description": "(Optional) The Virtual Machine auto shutdown settings."
         }
     }
 }

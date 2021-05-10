@@ -28,8 +28,10 @@
                         "virtualNetwork": "{parameters.virtualNetwork}",
                         "subnet": "{parameters.subnet}"
                     },
-                    "autoShutdownDailyRecurrence": "{parameters.autoShutdownTime}",
-                    "autoShutdownTimeZone": "{parameters.autoShutdownTimeZone}",
+                    "autoShutdown": {
+                        "dailyRecurrence": "{parameters.autoShutdownTime}",
+                        "timeZone": "{parameters.autoShutdownTimeZone}"    
+                    },
                     "userAssignedIdentity": "{parameters.userAssignedIdentity}"
                 }
             ]
