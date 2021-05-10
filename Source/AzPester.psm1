@@ -7,11 +7,38 @@ function Invoke-AzPester {
         [String] $Parameters
     )
 
-    $definitionJson = Get-Content $Definition -Raw
+    if ($Definition -NotMatch '\.yaml$' -and $Definition -NotMatch '\.yml$' -and $Definition -NotMatch '\.json$') {
+        Write-Error 'The file type is not supported'
+        Exit
+    }
+
+    [String] $definitionJson = $null
+
+    if ($Definition -match '\.yaml$' -or $Definition -match '\.yml$') {
+        $rawYaml = Get-Content $Definition -Raw
+        # Convert YAML to PowerShell Object
+        $psYaml = (ConvertFrom-Yaml -Yaml $rawYaml)
+        # Convert the Object to JSON
+        $definitionJson = @($psYaml | ConvertTo-Json -Depth 9)
+    }
+    else {
+        $definitionJson = Get-Content $Definition -Raw
+    }
 
     # Parameters file is optional
     if ($Parameters) {
-        $parametersJson = Get-Content $Parameters -Raw
+        [String] $parametersJson = $null
+
+        if ($Parameters -match '\.yaml$' -or $Parameters -match '\.yml$') {
+            $rawYaml = Get-Content $Parameters -Raw
+            # Convert YAML to PowerShell Object
+            $psYaml = (ConvertFrom-Yaml -Yaml $rawYaml)
+            # Convert the Object to JSON
+            $parametersJson = @($psYaml | ConvertTo-Json)
+        }
+        else {
+            $parametersJson = Get-Content $Parameters -Raw
+        }
     }
 
     $isValidSchemas = Assert-Schemas -DefinitionJson $definitionJson -ParametersJson $parametersJson
