@@ -68,6 +68,7 @@
                 },
                 "runFrom": {
                     "type": "array",
+                    "description": "(Required) An array of string where each item is a reference to the name of a runner declared in the runners collection.",
                     "items": {
                         "type": "string"
                     }
@@ -95,7 +96,7 @@
                 },
                 "sku": {
                     "type": "string",
-                    "description": "(Required) The SKU to use for the runner." 
+                    "description": "(Required) The SKU to use for the runner. The SKU must be supported by [Ephemeral OS](https://docs.microsoft.com/azure/virtual-machines/ephemeral-os-disks)." 
                 },
                 "sshPublicKey": {
                     "type": "string",
@@ -103,7 +104,7 @@
                 },
                 "context": {
                     "type": "string",
-                    "description": "(Optional) The name of the Azure context to use to resolve the subnet." 
+                    "description": "(Optional) The name of the Azure context to use to resolve the subnet. If not specified, it will use `default`." 
                 }
             },
             "additionalProperties": false
