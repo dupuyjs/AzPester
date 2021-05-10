@@ -51,6 +51,13 @@
 
 - `name`: (Required) The name of the virtual network.
   - Type: string
+- `context`: (Optional) The context name used for this resource. default context used if not specified.
+  - Type: string
+
+Note: You can target a subscription different than default one by using `context` property. However, you have to reference the associated subscription identifier and resource group name in the `contexts` section.
+
+For more details about contexts, please read the [REAME.md](../../../README.md) file.
+
 - `location`: (Optional) The location/region where the virtual network has been created.
   - Type: string
 - `enableDdosProtection`: (Optional) Specifies if DDoS protection is enabled for all the protected resources in the virtual network.
@@ -103,18 +110,10 @@
 
 - `name`: (Required) The remote virtual network name.
   - Type: string
-- `subscriptionId`: (Optional) The subscription identifier where is located the remote virtual network.
-  - Type: string
-- `resourceGroupName`: (Optional) The resource group name where is located the remote virtual network.
+- `context`: (Optional) The context name used for this resource. default context used if not specified.
   - Type: string
 
-Note: You can target a subsription different than default one. We will automatically detect the subscription and switch to the appropriate context.
-
-Anyway, you have to reference this subscription identifier in the `contexts` section. If not, the following warning will be displayed:
-
-```powershell
-"Warning: Subscription $scopeSubscriptionId is unknown. This subscription should be referenced in contexts."
-```
+Note: You can target a subscription different than default one by using `context` property. However, you have to reference the associated subscription identifier and resource group name in the `contexts` section.
 
 For more details about contexts, please read the [REAME.md](../../../README.md) file.
 
@@ -122,18 +121,10 @@ For more details about contexts, please read the [REAME.md](../../../README.md) 
 
 - `name`: (Required) The network security group name.
   - Type: string
-- `subscriptionId`: (Optional) The subscription identifier where is located the network security group.
-  - Type: string
-- `resourceGroupName`: (Optional) The resource group name where is located the network security group.
+- `context`: (Optional) The context name used for this resource. default context used if not specified.
   - Type: string
 
-Note: You can target a subsription different than default one. We will automatically detect the subscription and switch to the appropriate context.
-
-Anyway, you have to reference this subscription identifier in the `contexts` section. If not, the following warning will be displayed:
-
-```powershell
-"Warning: Subscription $scopeSubscriptionId is unknown. This subscription should be referenced in contexts."
-```
+Note: You can target a subscription different than default one by using `context` property. However, you have to reference the associated subscription identifier and resource group name in the `contexts` section.
 
 For more details about contexts, please read the [REAME.md](../../../README.md) file.
 
@@ -141,17 +132,9 @@ For more details about contexts, please read the [REAME.md](../../../README.md) 
 
 - `name`: (Required) The route table name.
   - Type: string
-- `subscriptionId`: (Optional) The subscription identifier where is located the route table.
-  - Type: string
-- `resourceGroupName`: (Optional) The resource group name where is located the route table.
+- `context`: (Optional) The context name used for this resource. default context used if not specified.
   - Type: string
 
-Note: You can target a subsription different than default one. We will automatically detect the subscription and switch to the appropriate context.
-
-Anyway, you have to reference this subscription identifier in the `contexts` section. If not, the following warning will be displayed:
-
-```powershell
-"Warning: Subscription $scopeSubscriptionId is unknown. This subscription should be referenced in contexts."
-```
+Note: You can target a subscription different than default one by using `context` property. However, you have to reference the associated subscription identifier and resource group name in the `contexts` section.
 
 For more details about contexts, please read the [REAME.md](../../../README.md) file.

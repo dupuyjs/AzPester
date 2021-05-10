@@ -28,24 +28,17 @@
         },
         "contexts": {
             "type": "object",
+            "required": [
+                "default"
+            ],
             "properties": {
                 "default": {
-                    "$ref": "#/definitions/context",
-                    "required": [
-                        "subscriptionId",
-                        "resourceGroupName"
-                    ]
+                    "$ref": "#/definitions/context"
                 }
             },
             "additionalProperties": {
-                "$ref": "#/definitions/context",
-                "required": [
-                    "subscriptionId"
-                ]
-            },
-            "required": [
-                "default"
-            ]
+                "$ref": "#/definitions/context"
+            }
         },
         "definition": {
             "type": "object",
@@ -58,6 +51,9 @@
                 },
                 "integration": {
                     "$ref": "./Integration/schema.integration.json#/definitions/integration"
+                },
+                "security": {
+                    "$ref": "./Security/schema.security.json#/definitions/security"
                 }
             },
             "additionalProperties": false
@@ -109,6 +105,10 @@
         },
         "context": {
             "type": "object",
+            "required": [
+                "subscriptionId",
+                "resourceGroupName"
+            ],
             "properties": {
                 "subscriptionId": {
                     "type": "string",

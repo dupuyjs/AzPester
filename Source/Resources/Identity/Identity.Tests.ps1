@@ -1,8 +1,6 @@
 param (
     [Parameter(Mandatory = $true)]
-    [PSObject] $Definition,
-    [Parameter(Mandatory = $true)]
-    [PSObject] $Contexts
+    [PSObject] $Definition
 )
 
 BeforeDiscovery {
@@ -30,24 +28,26 @@ Describe 'Identity Acceptance Tests' {
             $identity | Should -Not -BeNullOrEmpty
         }
         It 'Validate <name> has <role> role on <scope.displayName> resource' -ForEach $roleAssignments {
-            $roleAssignment = Get-RoleAssignment -Contexts $Contexts -ObjectId $identity.Id -Scope $scope.scope
+            $roleAssignment = Get-RoleAssignment -Definition $Definition -ObjectId $identity.Id -Scope $scope.scope
             $roleAssignment.RoleDefinitionName | Should -Be $role
         }
     }
+
     Context 'Managed Identity <name>' -ForEach $ManagedIdentities {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
-            $identity = Get-UserAssignedIdentity -Definition $Definition -Name $name
+            $identity = Get-UserAssignedIdentity -Definition $Definition -Name $name -Context $context
         }
 
         It 'Validate <name> has been created' {
             $identity | Should -Not -BeNullOrEmpty
         }
         It 'Validate <name> has <role> role on <scope.displayName> resource' -ForEach $roleAssignments {
-            $roleAssignment = Get-RoleAssignment -Contexts $Contexts -ObjectId $identity.PrincipalId -Scope $scope.scope
+            $roleAssignment = Get-RoleAssignment -Definition $Definition -ObjectId $identity.PrincipalId -Scope $scope.scope
             $roleAssignment.RoleDefinitionName | Should -Be $role
         }
     }
+    
     Context 'Group <name>' -ForEach $Groups {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
@@ -58,7 +58,7 @@ Describe 'Identity Acceptance Tests' {
             $identity | Should -Not -BeNullOrEmpty
         }
         It 'Validate <name> has <role> role on <scope.displayName> resource' -ForEach $roleAssignments {
-            $roleAssignment = Get-RoleAssignment -Contexts $Contexts -ObjectId $identity.Id -Scope $scope.scope
+            $roleAssignment = Get-RoleAssignment -Definition $Definition -ObjectId $identity.Id -Scope $scope.scope
             $roleAssignment.RoleDefinitionName | Should -Be $role
         }
     }

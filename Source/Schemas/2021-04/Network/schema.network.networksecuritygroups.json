@@ -14,6 +14,10 @@
                     "type": "string",
                     "description": "(Required) The name of the network security group."
                 },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The context name used for this resource."
+                },
                 "location": {
                     "type": "string",
                     "description": "(Optional) The location/region where the network security group has been created."
@@ -23,8 +27,15 @@
                     "items": {
                         "$ref": "#/definitions/securityRule"
                     }
+                },
+                "defaultSecurityRules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/securityRule"
+                    }
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "securityRule": {
             "type": "object",
@@ -32,6 +43,10 @@
                 "name"
             ],
             "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the security rule."
+                },
                 "protocol": {
                     "type": "string",
                     "description": "(Optional) The network protocol this rule applies to.",
@@ -120,7 +135,8 @@
                         "Outbound"
                     ]
                 }
-            }
+            },
+            "additionalProperties": false
         }
     }
 }

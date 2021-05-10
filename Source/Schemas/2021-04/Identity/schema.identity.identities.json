@@ -24,6 +24,10 @@
                         "Group"
                     ]
                 },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The context name used for this resource. Used only if type is ManagedIdentity."
+                },
                 "roleAssignments": {
                     "type": "array",
                     "items": {
