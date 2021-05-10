@@ -7,11 +7,18 @@ function Get-VirtualMachine {
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Name
+        [String] $Name,
+        [Parameter(Mandatory = $false)]
+        [String] $Context
     )
 
     $contextObject = $Definition.contexts.default
     $ResourceGroupName = $contextObject.ResourceGroupName
+
+    if ($Context) {
+        $contextObject = Get-Context -Definition $Definition -Context $Context
+        $resourceGroupName = $contextObject.ResourceGroupName
+    }
 
     Get-AzVM -ResourceGroupName $ResourceGroupName -Name $Name -DefaultProfile $contextObject.Value.Context
 }
@@ -23,13 +30,20 @@ function Get-VirtualMachineSubnets {
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $Name
+        [String] $Name,
+        [Parameter(Mandatory = $false)]
+        [String] $Context
     )
 
     $subnets = @()
 
     $contextObject = $Definition.contexts.default
     $ResourceGroupName = $contextObject.ResourceGroupName
+
+    if ($Context) {
+        $contextObject = Get-Context -Definition $Definition -Context $Context
+        $resourceGroupName = $contextObject.ResourceGroupName
+    }
 
     $vm = Get-VirtualMachine -Definition $Definition -Name $Name
 
@@ -87,12 +101,19 @@ function Get-UserAssignedIdentity {
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $IdentityName
+        [String] $IdentityName,
+        [Parameter(Mandatory = $false)]
+        [String] $Context
     )
 
     $contextObject = $Definition.contexts.default
     $ResourceGroupName = $contextObject.ResourceGroupName
     
+    if ($Context) {
+        $contextObject = Get-Context -Definition $Definition -Context $Context
+        $resourceGroupName = $contextObject.ResourceGroupName
+    }
+
     Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName -Name $IdentityName -DefaultProfile $contextObject.Value.Context
 }
 
@@ -103,11 +124,18 @@ function Get-ScheduleProperties {
         [PSObject] $Definition,
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $TargetResourceId
+        [String] $TargetResourceId,
+        [Parameter(Mandatory = $false)]
+        [String] $Context
     )
 
     $contextObject = $Definition.contexts.default
     $ResourceGroupName = $contextObject.ResourceGroupName
+
+    if ($Context) {
+        $contextObject = Get-Context -Definition $Definition -Context $Context
+        $resourceGroupName = $contextObject.ResourceGroupName
+    }
 
     $schedules = (Get-AzResource -ResourceGroupName $resourceGroupName -DefaultProfile $contextObject.Value.Context -ResourceType Microsoft.DevTestLab/schedules -ExpandProperties).Properties
     $schedules | Where-Object targetResourceId -eq $TargetResourceId 
