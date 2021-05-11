@@ -12,6 +12,7 @@ AzPester will only read Azure resource. No change can be made.
   - Az (version >= 5.8.0)
   - Az.ManagedServiceIdentity (version >= 0.7.3)
   - Pester (version >= 5.1.1)
+  - powershell-yaml (version >= 0.4.2)
 
 Note: Version requirements reflects our development environment installation. It can probably work with earlier versions but has not been tested.
 
@@ -22,6 +23,7 @@ Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
 Find-Module -Name Az | Install-Module -Scope CurrentUser
 Find-Module -Name Az.ManagedServiceIdentity | Install-Module -Scope CurrentUser
 Find-Module -Name Pester | Install-Module -Scope CurrentUser
+Find-Module -Name powershell-yaml | Install-Module -Scope CurrentUser
 ```
 
 And clone the repository.
@@ -216,3 +218,7 @@ These resources will validate if virtual networks are correctly provisioned with
 [Virtual Machine definition](Docs/Resources/Compute/VirtualMachine.md)
 
 This resource will check if Virtual Machines are correct provisioned with their associated properties (hardware profile, OS profile, etc.)
+
+### Integration
+
+[Runners and resource access checks](Docs/Resources/Integration/Integration.md)

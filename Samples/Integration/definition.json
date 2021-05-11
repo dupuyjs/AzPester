@@ -1,0 +1,74 @@
+{
+    "$schema": "../../Source/Schemas/2021-04/schema.definition.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        },
+        "location": {
+            "type": "string"
+        },
+        "testResourceGroupName": {
+            "type": "string"
+        },
+        "sshPublicKey": {
+            "type": "string"    
+        },
+        "testVmSku": {
+            "type": "string"
+        },
+        "vnet": {
+            "type": "string"
+        },
+        "subnet1": {
+            "type": "string"
+        },
+        "subnet2": {
+            "type": "string"
+        }
+    },
+    "contexts": {
+        "default": {
+            "subscriptionId": "{parameters.subscriptionId}",
+            "resourceGroupName": "{parameters.resourceGroupName}"
+        }
+    },
+    "definition": {
+        "integration": {
+            "testDeploymentInfo": {
+                "location": "{parameters.location}",
+                "resourceGroupName": "{parameters.testResourceGroupName}",
+                "cleanupTestDeployment": true 
+            },
+            "runners": {
+                "vm1": {
+                    "vnet": "{parameters.vnet}",
+                    "subnet": "{parameters.subnet1}",
+                    "sku": "{parameters.testVmSku}",
+                    "sshPublicKey": "{parameters.sshPublicKey}"
+                },
+                "vm2": {
+                    "vnet": "{parameters.vnet}",
+                    "subnet": "{parameters.subnet2}",
+                    "sku": "{parameters.testVmSku}",
+                    "sshPublicKey": "{parameters.sshPublicKey}"
+                }
+            },
+            "resourceAccessChecks": [
+                {
+                    "targetHost": "bing.com",
+                    "targetPort": 443,
+                    "runFrom": ["vm1", "vm2"]
+                },
+                {
+                    "targetHost": "google.com",
+                    "targetPort": 443,
+                    "runFrom": ["vm1", "vm2"]
+                }
+            ]
+        }
+    }
+}
