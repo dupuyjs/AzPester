@@ -213,6 +213,12 @@ These resources will validate if route tables are correctly provisioned with ass
 
 These resources will validate if virtual networks are correctly provisioned with associated properties (ex. subnets, peerings).
 
+### Compute
+
+[Virtual Machine definition](Docs/Resources/Compute/VirtualMachine.md)
+
+This resource will check if Virtual Machines are correct provisioned with their associated properties (hardware profile, OS profile, etc.)
+
 ### Integration
 
 [Runners and resource access checks](Docs/Resources/Integration/Integration.md)

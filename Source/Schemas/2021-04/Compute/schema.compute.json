@@ -1,0 +1,20 @@
+{
+    "id": "schema.compute",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Compute",
+    "description": "Schema for Compute Section",
+    "definitions": {
+        "compute": {
+            "type": "object",
+            "properties": {
+                "virtualMachines": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "schema.compute.virtualmachines.json#/definitions/virtualMachine"
+                    }
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

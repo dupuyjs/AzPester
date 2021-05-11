@@ -1,0 +1,138 @@
+{
+    "id": "schema.network.virtualnetworks",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Virtual Network",
+    "description": "Schema for Virtual Network Section",
+    "definitions": {
+        "virtualMachine": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the virtual machine."
+                },
+                "location": {
+                    "type": "string",
+                    "description": "(Optional) Resource location"
+                },
+                "vmSize": {
+                    "type": "string",
+                    "description": "(Optional) Specifies the size of the virtual machine."
+                },
+                "imageReference": {
+                    "$ref": "#/definitions/imageReference"
+                },
+                "networkProfile": {
+                    "$ref": "#/definitions/networkProfile"
+                },
+                "userAssignedIdentity": {
+                    "$ref": "#/definitions/userAssignedIdentity"
+                },
+                "autoShutdown": {
+                    "$ref": "#/definitions/autoShutdown"
+                }
+            }
+        },
+        "imageReference": {
+            "oneOf": [
+                {
+                    "type": "object",
+                    "required": [
+                        "gallery",
+                        "name",
+                        "version"
+                    ],
+                    "properties": {
+                        "gallery": {
+                            "type": "string",
+                            "description": "(Required) The Image Gallery name."
+                        },
+                        "name": {
+                            "type": "string",
+                            "description": "(Required) The Virtual Machine Image name."
+                        },
+                        "version": {
+                            "type": "string",
+                            "description": "(Required) The Virtual Machine Image version."
+                        },
+                        "context": {
+                            "type": "string",
+                            "description": "(Optional) The name of the Azure context to use to resolve the gallery."
+                        }
+                    }
+                },
+                {
+                    "type": "object",
+                    "required": [
+                        "publisher",
+                        "offer",
+                        "sku",
+                        "version"
+                    ],
+                    "properties": {
+                        "publisher": {
+                            "type": "string",
+                            "description": "(Required) The image publisher."
+                        },
+                        "offer": {
+                            "type": "string",
+                            "description": "(Required) The image offer."
+                        },
+                        "sku": {
+                            "type": "string",
+                            "description": "(Required) The image sku."
+                        },
+                        "version": {
+                            "type": "string",
+                            "description": "(Required) The image name."
+                        }
+                    }
+                }
+            ],
+            "description": "(Optional) The reference of the OS image."
+        },
+        "networkProfile": {
+            "type": "object",
+            "required": [
+                "virtualNetwork",
+                "subnet"
+            ],
+            "properties": {
+                "virtualNetwork": {
+                    "type": "string",
+                    "description": "(Required) The Virtual Network name."
+                },
+                "subnet": {
+                    "type": "string",
+                    "description": "(Required) The Subnet name."
+                }
+            },
+            "description": "(Optional) The Virtual Machine network profile."
+        },
+        "userAssignedIdentity": {
+            "type": "string",
+            "description": "(Optional) The User Assigned Managed Identity name."
+        },
+        "autoShutdown": {
+            "type": "object",
+            "required": [
+                "dailyRecurrence",
+                "timeZone"
+            ],
+            "properties": {
+                "dailyRecurrence": {
+                    "type": "string",
+                    "description": "(Required) The time of day the schedule will occur."
+                },
+                "timeZone": {
+                    "type": "string",
+                    "description": "(Required) The time zone ID (e.g. Pacific Standard time)."
+                }
+            },
+            "description": "(Optional) The Virtual Machine auto shutdown settings."
+        }
+    }
+}
