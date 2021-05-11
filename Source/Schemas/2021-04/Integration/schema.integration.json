@@ -1,0 +1,113 @@
+{
+    "id": "schema.integration",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Integration",
+    "description": "Schema for Integration Section",
+    "definitions": {
+        "integration": {
+            "type": "object",
+            "description": "",
+            "properties": {
+                "testDeploymentInfo": {
+                    "type": "object",
+                    "properties": {
+                        "resourceGroupName": {
+                            "type": "string",
+                            "description": "(Required) The name of the resource group that will be created for the test runners / infrastructure."
+                        },
+                        "location": {
+                            "type": "string",
+                            "description": "(Required) The Azure location where will be created the test runners / infrastructure."
+                        },
+                        "cleanupTestDeployment": {
+                            "type": "boolean",
+                            "description": "(Optional) A flag that indicates if the test infrastructure will be cleaned up after the integration tests."
+                        }
+                    },
+                    "required": [
+                        "resourceGroupName",
+                        "location"
+                    ],
+                    "additionalProperties": false
+                },
+                "runners": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/runner"
+                    },
+                    "description": "(Optional) List of all runners."
+                },
+                "resourceAccessChecks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/resourceAccessCheck"
+                    }
+                }
+            },
+            "required": [
+                "testDeploymentInfo",
+                "runners"
+            ],
+            "additionalProperties": false
+        },
+        "resourceAccessCheck":{
+            "type": "object",
+            "required": [
+                "targetHost",
+                "targetPort",
+                "runFrom"
+            ],
+            "properties":{
+                "targetHost": {
+                    "type": "string",
+                    "description": "(Required) The host of the target resource to check access." 
+                },
+                "targetPort": {
+                    "type": "number",
+                    "description": "(Required) The port of the target resource to check access." 
+                },
+                "runFrom": {
+                    "type": "array",
+                    "description": "(Required) An array of string where each item is a reference to the name of a runner declared in the runners collection.",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "runner": {
+            "type": "object",
+            "description": "(Required) The source subnet from where the resource access check must be done." ,
+            "required": [
+                "vnet",
+                "subnet",
+                "sku",
+                "sshPublicKey"
+            ],
+            "properties": {
+                "vnet": {
+                    "type": "string",
+                    "description": "(Required) The name of the source virtual network." 
+                },
+                "subnet": {
+                    "type": "string",
+                    "description": "(Required) The name of the source subnet." 
+                },
+                "sku": {
+                    "type": "string",
+                    "description": "(Required) The SKU to use for the runner. The SKU must be supported by [Ephemeral OS](https://docs.microsoft.com/azure/virtual-machines/ephemeral-os-disks)." 
+                },
+                "sshPublicKey": {
+                    "type": "string",
+                    "description": "(Required) The SSH public key to use for the runner." 
+                },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The name of the Azure context to use to resolve the subnet. If not specified, it will use `default`." 
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

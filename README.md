@@ -212,3 +212,7 @@ These resources will validate if route tables are correctly provisioned with ass
 [Virtual Network definition](Docs/Resources/Network/VirtualNetwork.md)
 
 These resources will validate if virtual networks are correctly provisioned with associated properties (ex. subnets, peerings).
+
+### Integration
+
+[Runners and resource access checks](Docs/Resources/Integration/Integration.md)

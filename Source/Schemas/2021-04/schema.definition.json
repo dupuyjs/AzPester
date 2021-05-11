@@ -49,6 +49,9 @@
                 "identity": {
                     "$ref": "./Identity/schema.identity.json#/definitions/identity"
                 },
+                "integration": {
+                    "$ref": "./Integration/schema.integration.json#/definitions/integration"
+                },
                 "security": {
                     "$ref": "./Security/schema.security.json#/definitions/security"
                 }
