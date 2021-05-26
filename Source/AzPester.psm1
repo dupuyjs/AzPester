@@ -4,7 +4,11 @@ function Invoke-AzPester {
         [ValidateNotNullOrEmpty()]
         [String] $Definition,
         [Parameter(Mandatory = $false)]
-        [String] $Parameters
+        [String] $Parameters,
+        [Parameter(Mandatory = $false)]
+        [String[]] $Tags,
+        [Parameter(Mandatory = $false)]
+        [String[]] $ExcludeTags
     )
 
     if ($Definition -NotMatch '\.yaml$' -and $Definition -NotMatch '\.yml$' -and $Definition -NotMatch '\.json$') {
@@ -56,7 +60,8 @@ function Invoke-AzPester {
             Set-AzContext -Context $contexts["default"].Context
 
             $container = New-PesterContainer -Path '*' -Data @{ Definition = $definitionWithParameters.definition }
-            Invoke-Pester -Container $container -Output 'Detailed'
+            
+            Invoke-Pester -Container $container -TagFilter $Tags -ExcludeTagFilter $ExcludeTags -Output 'Detailed'
         }
     }
 }

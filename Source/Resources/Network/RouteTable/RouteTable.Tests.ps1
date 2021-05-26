@@ -13,7 +13,7 @@ BeforeAll {
     . $PSScriptRoot/../Network.ps1
 }
 
-Describe 'Route Table <name> Acceptance Tests' -ForEach $RouteTables {
+Describe 'Route Table <name> Acceptance Tests' -Tag 'Network' -ForEach $RouteTables {
     BeforeAll {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
         $routeTable = Get-RouteTable -Definition $Definition -Name $name -Context $context

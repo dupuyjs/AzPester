@@ -143,6 +143,18 @@ In addition, you can dissociate parameters values (at least the ones with no def
 PS C:\AzPester> Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json
 ```
 
+## Tags
+
+AzPester supports the Tags parameters to select the tests that will be executed or excluded.
+
+```powershell
+PS C:\AzPester> Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json -TagFilter Network -ExcludeTagFilter Security
+```
+
+> **Info**: If *TagFilter* and *ExcludeTagFilter* parameters are empty, all tests will be executed.
+
+> **Note**: To learn more about test tags, check the official Pester Documentation: [https://pester-docs.netlify.app/docs/usage/tags](https://pester-docs.netlify.app/docs/usage/tags)
+
 ## Contexts
 
 This section will define the default subscription and resource group targeted for tests. By the way, `default` property is required, and json schema validation will fail if you don't provide it.

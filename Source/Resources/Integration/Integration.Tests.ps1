@@ -10,7 +10,7 @@ BeforeDiscovery {
     $ResourceAccessChecks = Find-ResourceAccessChecks -Definition $Definition
 }
 
-Describe 'Integration Tests' {
+Describe 'Integration Tests' -Tag 'Integration' {
     BeforeAll {
         # Deploy testing infrastructure according to integration tests definition file.
         $TestDeploymentInfo = Find-TestDeploymentInfo -Definition $Definition

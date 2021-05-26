@@ -13,7 +13,7 @@ BeforeAll {
     . $PSScriptRoot/../Network.ps1
 }
 
-Describe 'Virtual Network <name> Acceptance Tests' -ForEach $VirtualNetworks {
+Describe 'Virtual Network <name> Acceptance Tests' -Tag 'Network' -ForEach $VirtualNetworks {
     BeforeAll {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
         $virtualNetwork = Get-VirtualNetwork -Definition $Definition -Name $name -Context $context

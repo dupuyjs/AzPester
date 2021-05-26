@@ -17,7 +17,7 @@ BeforeAll {
     . $PSScriptRoot/Identity.ps1
 }
 
-Describe 'Identity Acceptance Tests' {
+Describe 'Identity Acceptance Tests' -Tag 'Identity' {
     Context 'Service Principal <name>' -ForEach $ServicePrincipals {
         BeforeAll {
             [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]

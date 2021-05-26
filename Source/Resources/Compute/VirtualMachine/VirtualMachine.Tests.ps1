@@ -13,7 +13,7 @@ BeforeAll {
     . $PSScriptRoot/VirtualMachine.ps1
 }
 
-Describe 'Virtual Machine <name> Acceptance Tests' -ForEach $VirtualMachines {
+Describe 'Virtual Machine <name> Acceptance Tests' -Tag 'Compute' -ForEach $VirtualMachines {
     BeforeAll {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
         $vm = Get-VirtualMachine -Definition $Definition -Name $_.name
