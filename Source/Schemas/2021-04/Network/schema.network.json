@@ -24,6 +24,12 @@
                     "items": {
                         "$ref": "schema.network.virtualnetworks.json#/definitions/virtualNetwork"
                     }
+                },
+                "privateDnsZones": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "schema.network.privatednszones.json#/definitions/privateDnsZone"
+                    }
                 }
             },
             "additionalProperties": false
