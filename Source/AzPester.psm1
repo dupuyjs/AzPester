@@ -16,8 +16,6 @@ function Invoke-AzPester {
         Exit
     }
 
-    [String] $definitionJson = $null
-
     if ($Definition -match '\.yaml$' -or $Definition -match '\.yml$') {
         $rawYaml = Get-Content $Definition -Raw
         # Convert YAML to PowerShell Object
@@ -31,8 +29,6 @@ function Invoke-AzPester {
 
     # Parameters file is optional
     if ($Parameters) {
-        [String] $parametersJson = $null
-
         if ($Parameters -match '\.yaml$' -or $Parameters -match '\.yml$') {
             $rawYaml = Get-Content $Parameters -Raw
             # Convert YAML to PowerShell Object
@@ -151,7 +147,7 @@ function Set-Parameters {
     }
     
     # Regular expression used to get all expression placeholders
-    $results = $DefinitionJson | Select-String '\{parameters.[a-zA-Z0-9_.-]+}' -AllMatches
+    $results = $DefinitionJson | Select-String '{parameters.[a-zA-Z0-9_.-\[\]]+}' -AllMatches
 
     # Create an hashtable with placeholders and associated values
     $placeHolders = @{}
@@ -164,14 +160,24 @@ function Set-Parameters {
 
         $trim = $key.Trim('{', '}')
         $split = $trim.Split('.')
-        $name = $split[1]
+
+        # Case our base property is an array
+        $searchIndex = $split[1] | Select-String '\[[0-9]+\]'
+        if($null -ne $searchIndex.Matches) {
+            $arrayIndex = $searchIndex.Matches[0].Value
+            $propertyName = $split[1] -replace [regex]::Escape($arrayIndex), ''
+        }
+        else {
+            $arrayIndex = $null
+            $propertyName = $split[1]
+        }
 
         # Get the parameter value or default value
-        if (${targetParameters}?[$name].defaultValue) {
-            $expression = '$targetParameters.' + $split[1] + '.defaultValue'
+        if (${targetParameters}?[$propertyName].defaultValue) {
+            $expression = '$targetParameters.' + $propertyName + '.defaultValue' + $arrayIndex
         }
-        elseif (${sourceParameters}?[$name].value) {   
-            $expression = '$sourceParameters.' + $split[1] + '.value'
+        elseif (${sourceParameters}?[$propertyName].value) {   
+            $expression = '$sourceParameters.' + $propertyName + '.value' + $arrayIndex
         }
         else {
             Write-Host "Warning: Cannot evaluate placeholder expression $key. This parameter name seems invalid." -ForegroundColor Yellow
@@ -197,7 +203,7 @@ function Set-Parameters {
 
     # Update json file with placeholder values
     foreach ($placeHolder in $placeHolders.GetEnumerator()) {
-        $DefinitionJson = $DefinitionJson -replace $placeHolder.key, $placeHolder.value
+        $DefinitionJson = $DefinitionJson -replace [regex]::Escape($placeHolder.key), $placeHolder.value
     }
 
     return ($DefinitionJson | ConvertFrom-Json -AsHashtable)
