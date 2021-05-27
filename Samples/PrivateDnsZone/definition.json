@@ -5,10 +5,6 @@
         "default": {
             "subscriptionId": "{parameters.subscriptionId}",
             "resourceGroupName": "{parameters.resourceGroupName}"
-        },
-        "transit": {
-            "subscriptionId": "{parameters.subscriptionId}",
-            "resourceGroupName": "rg-ms360-tests-transit"
         }
     },
     "definition": {
