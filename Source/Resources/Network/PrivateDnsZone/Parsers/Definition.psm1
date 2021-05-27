@@ -28,7 +28,7 @@ function Find-PrivateDnsZones {
                 if ($link.virtualNetworkName) {
                     $linkProperties += Add-Property -PropertyName 'virtualNetworkName' -PropertyValue $link.virtualNetworkName
                 }
-                if ($link.registrationEnabled) {
+                if ($link.PSObject.BaseObject.Contains("registrationEnabled")) {
                     $linkProperties += Add-Property -PropertyName 'registrationEnabled' -PropertyValue $link.registrationEnabled
                 }
 
