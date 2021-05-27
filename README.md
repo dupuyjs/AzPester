@@ -225,6 +225,10 @@ These resources will validate if route tables are correctly provisioned with ass
 
 These resources will validate if virtual networks are correctly provisioned with associated properties (ex. subnets, peerings).
 
+[Private DNS Zone definition](Docs/Resources/Network/PrivateDnsZone.md)
+
+These resources will validate if Private DNS Zones are correctly provisioned and associated with Virtual Networs.
+
 ### Compute
 
 [Virtual Machine definition](Docs/Resources/Compute/VirtualMachine.md)

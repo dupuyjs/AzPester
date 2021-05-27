@@ -1,0 +1,21 @@
+{
+    "$schema": "../../Source/Schemas/2021-04/schema.definition.parameters.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "subscriptionId": {
+            "value": "__SUBSCRIPTION_ID__"
+        },
+        "resourceGroupName": {
+            "value": "__RESOURCE_GROUP_NAME__"
+        },
+        "privateDnsZoneName": {
+            "value": "__PRIVATE_DNS_ZONE_NAME__"
+        },
+        "virtualNetworkLinkName": {
+            "value": "__VIRTUAL_NETWORK_LINK_NAME__"
+        },
+        "virtualNetworkLinkVnetName": {
+            "value": "__VIRTUAL_NETWORK_LINK_VNET_NAME__"
+        }
+    }
+}

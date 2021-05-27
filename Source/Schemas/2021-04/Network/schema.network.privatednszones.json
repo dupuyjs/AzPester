@@ -1,0 +1,55 @@
+{
+    "id": "schema.network.privatednszones",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "Private DNS Zone",
+    "description": "Schema for Private DNS Zones",
+    "definitions": {
+        "privateDnsZone": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the private DNS zone."
+                },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The context name used for this resource."
+                },
+                "virtualNetworkLinks": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/virtualNetworkLink"
+                    }
+                }
+            }
+        },
+        "virtualNetworkLink": {
+            "type": "object",
+            "required": [
+                "name",
+                "virtualNetworkName"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the virtual network link."
+                },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The context name used for this resource."
+                },
+                "virtualNetworkName": {
+                    "type": "string",
+                    "description": "(Required) The name of the linked virtual network."
+                },
+                "registrationEnabled": {
+                    "type": "boolean",
+                    "description": "(Optional) Is auto-registration enabled."
+                }
+            }
+        }
+    }
+}
