@@ -1,8 +1,13 @@
 # AzPester
 
-AzPester is a superset framework built on top of [Pester](https://github.com/pester/Pester) to validate Azure environments. You have just to define your target infrastucture using a json definition file and AzPester will evaluate if your cloud environment is alligned.
+AzPester is a superset framework built on top of [Pester](https://github.com/pester/Pester) to validate Azure environments. You have just to define your target infrastucture using a json or yaml definition file and AzPester will evaluate if your cloud environment is alligned.
 
-AzPester will only read Azure resource. No change can be made.  
+It helps you ensure:
+
+- Your initial deployment follows a specific definition requirements.
+- Detect potential drift of your infrastructure over time.
+
+AzPester will only read Azure resource. No change is made, **except if you use integration resources**.
 
 ## Requirements
 
@@ -32,7 +37,7 @@ And clone the repository.
 git clone https://github.com/dupuyjs/AzPester.git
 ```
 
-This framework cannot be packaged as a standalone Powershell module as *.Tests.p1 files used by Pester should be located in a child repository from where you invoke `Invoke-AzPester` command.
+This framework is currently not packaged as standalone Powershell module. You have to clone the repo to get AzPester module and all Tests definitions.
 
 ## Usage
 
@@ -77,7 +82,7 @@ PS C:\AzPester> Invoke-AzPester -Definition definition.json
 
 You can declare an array of `parameter` objects in your definition file. `type` property is required, and `defaultValue` optional.
 
-These parameters can then be used in the definition file using the syntax `{parameters.<parameterName>}`. Complex object types are supported.
+These parameters can then be used in the definition file using the syntax `{parameters.<parameterName>}`. Complex types and array are supported.
 
 ```json
 {
@@ -143,17 +148,41 @@ In addition, you can dissociate parameters values (at least the ones with no def
 PS C:\AzPester> Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json
 ```
 
-## Tags
+If needed, we support also getting parameters from an ARM deployment. It can avoid to copy/paste existings values. You still need to declare the properties in the definition file but values will be retrieved from ARM deployment.
 
-AzPester supports the Tags parameters to select the tests that will be executed or excluded.
-
-```powershell
-PS C:\AzPester> Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json -TagFilter Network -ExcludeTagFilter Security
+```json
+{
+    "$schema": "../Source/Schemas/2021-04/schema.definition.parameters.json",
+    "contentVersion": "1.0.0.0",
+    "deployment": {
+        "name": "azuredeploy",
+        "subscriptionId": "__SUBSCRIPTION_ID__",
+        "resourceGroupName": "__RESOURCE_GROUP_NAME__" 
+     }
+}
 ```
 
-> **Info**: If *TagFilter* and *ExcludeTagFilter* parameters are empty, all tests will be executed.
+If you mix deployment section and parameter sections with same property name, how values are retrieved ?
 
-> **Note**: To learn more about test tags, check the official Pester Documentation: [https://pester-docs.netlify.app/docs/usage/tags](https://pester-docs.netlify.app/docs/usage/tags)
+Priority Order:
+
+1. Parameter defined in parameters section
+2. Parameter defined in ARM deployment inputs
+3. Default value defined in definition file
+
+## Tags
+
+By default, AzPester will automatically detect tests needed based on your definition file. However, if you want to reduce the scope of these tests, you can include or exclude some tags.
+
+AzPester supports `Tags` and `ExcludeTags` parameters to select the tests that will be executed or excluded.
+
+```powershell
+PS C:\AzPester> Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json -Tags Network
+```
+
+```powershell
+PS C:\AzPester> Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json -ExcludeTags Security
+```
 
 ## Contexts
 
@@ -205,13 +234,19 @@ If you need to target a specific subscription when declaring a resource (differe
 
 Please find below documentation of resources currently supported.
 
-### Identity Documentation
+### Compute
+
+[Virtual Machine definition](Docs/Resources/Compute/VirtualMachine.md)
+
+This resource will check if Virtual Machines are correct provisioned with their associated properties (hardware profile, OS profile, etc.)
+
+### Identity
 
 [Identies and Scopes definition](Docs/Resources/Identity/Identity.md)
 
 These resources will validate if service principals, managed identies and groups are correctly provisioned. In addition, you can also check role assignments associated to these identities.
 
-### Network Documentation
+### Network
 
 [Network Security Group definition](Docs/Resources/Network/NetworkSecurityGroup.md.md)
 
@@ -223,17 +258,17 @@ These resources will validate if route tables are correctly provisioned with ass
 
 [Virtual Network definition](Docs/Resources/Network/VirtualNetwork.md)
 
-These resources will validate if virtual networks are correctly provisioned with associated properties (ex. subnets, peerings).
+These resources will validate if virtual networks are correctly provisioned with associated properties (subnets, peerings, etc.).
 
 [Private DNS Zone definition](Docs/Resources/Network/PrivateDnsZone.md)
 
-These resources will validate if Private DNS Zones are correctly provisioned and associated with Virtual Networs.
+These resources will validate if private DNS zones are correctly provisioned and linked to Virtual Networks.
 
-### Compute
+### Security
 
-[Virtual Machine definition](Docs/Resources/Compute/VirtualMachine.md)
+[Key Vault definition](Docs/Resources/Security/KeyVault.md)
 
-This resource will check if Virtual Machines are correct provisioned with their associated properties (hardware profile, OS profile, etc.)
+These resources will validate if key vaults and associtated access policies are correctly provisioned. In addition, can also tests that names of keys, secrets and certificates exist in the vault.
 
 ### Integration
 
