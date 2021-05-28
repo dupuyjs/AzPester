@@ -11,55 +11,85 @@ function Invoke-AzPester {
         [String[]] $ExcludeTags
     )
 
-    if ($Definition -NotMatch '\.yaml$' -and $Definition -NotMatch '\.yml$' -and $Definition -NotMatch '\.json$') {
-        Write-Error 'The file type is not supported'
-        Exit
-    }
-
-    if ($Definition -match '\.yaml$' -or $Definition -match '\.yml$') {
-        $rawYaml = Get-Content $Definition -Raw
-        # Convert YAML to PowerShell Object
-        $psYaml = (ConvertFrom-Yaml -Yaml $rawYaml)
-        # Convert the Object to JSON
-        $definitionJson = @($psYaml | ConvertTo-Json -Depth 9)
-    }
-    else {
-        $definitionJson = Get-Content $Definition -Raw
-    }
-
+    $definitionJson = Get-Json $Definition
     # Parameters file is optional
     if ($Parameters) {
-        if ($Parameters -match '\.yaml$' -or $Parameters -match '\.yml$') {
-            $rawYaml = Get-Content $Parameters -Raw
-            # Convert YAML to PowerShell Object
-            $psYaml = (ConvertFrom-Yaml -Yaml $rawYaml)
-            # Convert the Object to JSON
-            $parametersJson = @($psYaml | ConvertTo-Json)
-        }
-        else {
-            $parametersJson = Get-Content $Parameters -Raw
-        }
+        $parametersJson = Get-Json $Parameters
     }
 
+    # Validate schemas from definition and parameters json files
     $isValidSchemas = Assert-Schemas -DefinitionJson $definitionJson -ParametersJson $parametersJson
-
     if ($isValidSchemas) {
-        $isValidParameters = Assert-Parameters -DefinitionJson $definitionJson -ParametersJson $parametersJson
+
+        $definitionHash = $DefinitionJson | ConvertFrom-Json -AsHashtable
+        # Parameters file is optional
+        if ($Parameters) {
+            $parametersHash = $parametersJson | ConvertFrom-Json -AsHashtable
+            $deployment = $ParametersHash.deployment
+            
+            if ($deployment) {
+                # Check if we need to retrieve additional parameters from deployment
+                $parametersDepl = Get-DeploymentParameters -DeploymentInfo $deployment
+            }
+        }
+        
+        $isValidParameters = Assert-Parameters `
+            -DefinitionHash $definitionHash `
+            -ParametersHash $parametersHash `
+            -ParametersDepl $parametersDepl
 
         if ($isValidParameters) {
-            $definitionWithParameters = Set-Parameters -DefinitionJson $definitionJson -ParametersJson $parametersJson
+            $definitionWithParameters = Set-Parameters `
+                -DefinitionJson $definitionJson `
+                -DefinitionHash $definitionHash `
+                -ParametersHash $parametersHash `
+                -ParametersDepl $parametersDepl
+
             # Getting contexts and assigning them to the definition
-            $contexts = Get-Contexts -Definition $definitionWithParameters
+            $contexts = Get-Contexts -DefinitionHash $definitionWithParameters
             $definitionWithParameters.definition.contexts = $contexts
 
             # Switching on default subscription
             Set-AzContext -Context $contexts["default"].Context
 
-            $container = New-PesterContainer -Path '*' -Data @{ Definition = $definitionWithParameters.definition }
+            $path = "$PSScriptRoot/Resources/*"
+            $container = New-PesterContainer -Path $path -Data @{ Definition = $definitionWithParameters.definition }
             
-            Invoke-Pester -Container $container -TagFilter $Tags -ExcludeTagFilter $ExcludeTags -Output 'Detailed'
+            Invoke-Pester -Container $container -TagFilter $Tags -ExcludeTagFilter $ExcludeTags -Output 'Detailed' -CI
         }
     }
+}
+
+function Get-Json {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $FilePath
+    )
+
+    if ($FilePath -match '\.yaml$' -or $FilePath -match '\.yml$') {
+        $yaml = Get-Content $FilePath -Raw
+        $json = (ConvertFrom-Yaml -Yaml $yaml) | ConvertTo-Json
+    }
+    else {
+        $json = Get-Content $FilePath -Raw
+    }
+
+    return $json
+}
+
+function Get-DeploymentParameters {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [PSObject] $DeploymentInfo
+    )
+
+    Write-Host "Getting $($DeploymentInfo.name) deployment parameters." -ForegroundColor Magenta
+    $context = Get-AzSubscription -SubscriptionId $deployment.subscriptionId | Set-AzContext
+    $deployment = Get-AzResourceGroupDeployment -ResourceGroupName $deployment.resourceGroupName -Name $deployment.name -DefaultProfile $context
+
+    return $deployment.Parameters
 }
 
 function Assert-Schemas {
@@ -96,20 +126,33 @@ function Assert-Parameters {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
-        [String] $DefinitionJson,
+        [PSObject] $DefinitionHash,
         [Parameter(Mandatory = $false)]
-        [String] $ParametersJson
+        [PSObject] $ParametersHash,
+        [Parameter(Mandatory = $false)]
+        [PSObject] $ParametersDepl
     )
 
-    $targetParameters = ($DefinitionJson | ConvertFrom-Json -AsHashtable).parameters
+    $targetParameters = $DefinitionHash.parameters
+    if ($null -eq $targetParameters) {
+        # Definition file contains no parameter, nothing to assert
+        return $true
+    }
 
     # Parameters file is optional
-    if ($ParametersJson) {
-        $sourceParameters = ($ParametersJson | ConvertFrom-Json -AsHashtable).parameters
-
-        if ($targetParameters) {
+    if ($ParametersHash) {
+        $sourceParameters = $ParametersHash.parameters
+        if ($ParametersDepl) {
             foreach ($parameter in $targetParameters.GetEnumerator()) {
-                if (!$sourceParameters.ContainsKey($parameter.key) -and (!$parameter.value.defaultValue)) {
+                if (!$sourceParameters.ContainsKey($parameter.key) -and !$ParametersDepl.ContainsKey($parameter.key) -and !$parameter.value.defaultValue) {
+                    Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
+                    return $false
+                }
+            }
+        }
+        else {
+            foreach ($parameter in $targetParameters.GetEnumerator()) {
+                if (!$sourceParameters.ContainsKey($parameter.key) -and !$parameter.value.defaultValue) {
                     Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
                     return $false
                 }
@@ -117,12 +160,10 @@ function Assert-Parameters {
         }
     }
     else {
-        if ($targetParameters) {
-            foreach ($parameter in $targetParameters.GetEnumerator()) {
-                if (!$parameter.value.defaultValue) {
-                    Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
-                    return $false
-                }
+        foreach ($parameter in $targetParameters.GetEnumerator()) {
+            if (!$parameter.value.defaultValue) {
+                Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
+                return $false
             }
         }
     }
@@ -135,18 +176,23 @@ function Set-Parameters {
         [Parameter(Mandatory = $true)]
         [ValidateNotNullOrEmpty()]
         [String] $DefinitionJson,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [PSObject] $DefinitionHash,
         [Parameter(Mandatory = $false)]
-        [String] $ParametersJson
+        [PSObject] $ParametersHash,
+        [Parameter(Mandatory = $false)]
+        [PSObject] $ParametersDepl
     )
 
-    $targetParameters = ($DefinitionJson | ConvertFrom-Json -AsHashtable).parameters
+    $targetParameters = $DefinitionHash.parameters
     
     # Parameters file is optional
-    if ($ParametersJson) {
-        $sourceParameters = ($ParametersJson | ConvertFrom-Json -AsHashtable).parameters
+    if ($ParametersHash) {
+        $sourceParameters = $ParametersHash.parameters
     }
     
-    # Regular expression used to get all expression placeholders
+    # Regular expression used to get all expression placeholders {parameters.x}
     $results = $DefinitionJson | Select-String '{parameters.[a-zA-Z0-9_.-\[\]]+}' -AllMatches
 
     # Create an hashtable with placeholders and associated values
@@ -161,9 +207,9 @@ function Set-Parameters {
         $trim = $key.Trim('{', '}')
         $split = $trim.Split('.')
 
-        # Case our base property is an array
+        # Identify if our base property is an array {parameters.x[1]}
         $searchIndex = $split[1] | Select-String '\[[0-9]+\]'
-        if($null -ne $searchIndex.Matches) {
+        if ($null -ne $searchIndex.Matches) {
             $arrayIndex = $searchIndex.Matches[0].Value
             $propertyName = $split[1] -replace [regex]::Escape($arrayIndex), ''
         }
@@ -172,19 +218,26 @@ function Set-Parameters {
             $propertyName = $split[1]
         }
 
-        # Get the parameter value or default value
-        if (${targetParameters}?[$propertyName].defaultValue) {
-            $expression = '$targetParameters.' + $propertyName + '.defaultValue' + $arrayIndex
-        }
-        elseif (${sourceParameters}?[$propertyName].value) {   
+        # Build expression to get property value
+        # Priority: 
+        # 1. Parameter defined in parameters file
+        # 2. Parameter defined in deployment inputs
+        # 3. Default value defined in definition file
+        if (${sourceParameters}?[$propertyName].value) {   
             $expression = '$sourceParameters.' + $propertyName + '.value' + $arrayIndex
+        }
+        elseif (${ParametersDepl}?[$propertyName].value) {
+            $expression = '$ParametersDepl.' + $propertyName + '.value' + $arrayIndex
+        }
+        elseif (${targetParameters}?[$propertyName].defaultValue) {
+            $expression = '$targetParameters.' + $propertyName + '.defaultValue' + $arrayIndex
         }
         else {
             Write-Host "Warning: Cannot evaluate placeholder expression $key. This parameter name seems invalid." -ForegroundColor Yellow
             continue
         }
 
-        # Build the expression if type is complex
+        # Build expression if type is complex
         if ($split.Length -gt 2) {
             for (($i = 2); ($i -lt $split.Length); $i++) {
                 $property = $split[$i]
@@ -212,13 +265,13 @@ function Set-Parameters {
 function Get-Contexts {
     param (
         [Parameter(Mandatory = $true)]
-        [PSObject] $Definition
+        [PSObject] $DefinitionHash
     )
 
     $contexts = @{}
     Write-Host 'Getting all subscription contexts.' -ForegroundColor Magenta
 
-    ForEach ($context in $Definition.contexts.GetEnumerator()) {
+    ForEach ($context in $DefinitionHash.contexts.GetEnumerator()) {
         $subscriptionId = $context.value.subscriptionId
         $contextName = $context.key
 

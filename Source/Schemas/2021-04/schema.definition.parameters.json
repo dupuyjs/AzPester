@@ -13,6 +13,9 @@
             "pattern": "(^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$)",
             "description": "A 4 number format for the version number of this parameter file. For example, 1.0.0.0"
         },
+        "deployment": {
+            "$ref": "#/definitions/deployment"
+        },
         "parameters": {
             "type": "object",
             "additionalProperties": {
@@ -34,6 +37,29 @@
                 "value": {
                     "$ref": "schema.definition.json#/definitions/parameterValueTypes",
                     "description": "Input value to definition file"
+                }
+            },
+            "additionalProperties": false
+        },
+        "deployment": {
+            "type": "object",
+            "required": [
+                "name",
+                "subscriptionId",
+                "resourceGroupName"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The deployment name."
+                },
+                "subscriptionId": {
+                    "type": "string",
+                    "description": "The subscription identifier."
+                },
+                "resourceGroupName": {
+                    "type": "string",
+                    "description": "The resource group name."
                 }
             },
             "additionalProperties": false
