@@ -1,6 +1,6 @@
 # VNET to VNET connection
 
-This template allows you to create a Virtual Network with two subnets.
+This template creates two VNETs in the same location, each containing a single subnet, and creates connections between them using VNet peering.
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fdupuyjs%2FAzPester%2Fmain%2FSamples%2FNetwork%2Fvnet-to-vnet-peering%2Farm%2Fazuredeploy.json)
 
