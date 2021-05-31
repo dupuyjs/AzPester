@@ -144,7 +144,7 @@ function Assert-Parameters {
         $sourceParameters = $ParametersHash.parameters
         if ($ParametersDepl) {
             foreach ($parameter in $targetParameters.GetEnumerator()) {
-                if (!$sourceParameters.ContainsKey($parameter.key) -and !$ParametersDepl.ContainsKey($parameter.key) -and !$parameter.value.defaultValue) {
+                if (!$sourceParameters.ContainsKey($parameter.key) -and !$ParametersDepl.ContainsKey($parameter.key) -and ($null -eq $parameter.value.defaultValue)) {
                     Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
                     return $false
                 }
@@ -152,7 +152,7 @@ function Assert-Parameters {
         }
         else {
             foreach ($parameter in $targetParameters.GetEnumerator()) {
-                if (!$sourceParameters.ContainsKey($parameter.key) -and !$parameter.value.defaultValue) {
+                if (!$sourceParameters.ContainsKey($parameter.key) -and ($null -eq $parameter.value.defaultValue)) {
                     Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
                     return $false
                 }
@@ -161,7 +161,7 @@ function Assert-Parameters {
     }
     else {
         foreach ($parameter in $targetParameters.GetEnumerator()) {
-            if (!$parameter.value.defaultValue) {
+            if ($null -eq $parameter.value.defaultValue) {
                 Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
                 return $false
             }
