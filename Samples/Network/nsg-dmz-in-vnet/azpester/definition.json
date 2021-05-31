@@ -1,0 +1,210 @@
+{
+    "$schema": "../../../../Source/Schemas/2021-04/schema.definition.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualNetworkName": {
+            "type": "string",
+            "defaultValue": "First_ARM_VNet"
+        },
+        "addressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16"
+        },
+        "FESubnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24"
+        },
+        "AppSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.1.0/24"
+        },
+        "DBSubnetPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.2.0/24"
+        },
+        "FENSGName": {
+            "type": "string",
+            "defaultValue": "FE_NSG"
+        },
+        "AppNSGName": {
+            "type": "string",
+            "defaultValue": "App_NSG"
+        },
+        "DBNSGName": {
+            "type": "string",
+            "defaultValue": "DB_NSG"
+        },
+        "location": {
+            "type": "string"
+        },
+        "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        }
+    },
+    "contexts": {
+        "default": {
+            "subscriptionId": "{parameters.subscriptionId}",
+            "resourceGroupName": "{parameters.resourceGroupName}"
+        }
+    },
+    "definition": {
+        "network": {
+            "virtualNetworks": [
+                {
+                    "name": "{parameters.virtualNetworkName}",
+                    "location": "{parameters.location}",
+                    "addressSpace": [
+                        {
+                            "addressPrefix": "{parameters.addressPrefix}"
+                        }
+                    ],
+                    "subnets": [
+                        {
+                            "name": "FESubnet",
+                            "addressPrefix": "{parameters.FESubnetPrefix}",
+                            "networkSecurityGroup": {
+                                "name": "{parameters.FENSGName}"
+                            }
+                        },
+                        {
+                            "name": "AppSubnet",
+                            "addressPrefix": "{parameters.AppSubnetPrefix}",
+                            "networkSecurityGroup": {
+                                "name": "{parameters.AppNSGName}"
+                            }
+                        },
+                        {
+                            "name": "DBSubnet",
+                            "addressPrefix": "{parameters.DBSubnetPrefix}",
+                            "networkSecurityGroup": {
+                                "name": "{parameters.DBNSGName}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "networkSecurityGroups": [
+                {
+                    "name": "{parameters.FENSGName}",
+                    "location": "{parameters.location}",
+                    "securityRules": [
+                        {
+                            "name": "rdp_rule",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        },
+                        {
+                            "name": "web_rule",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "80",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 101,
+                            "direction": "Inbound"
+                        }
+                    ]
+                },
+                {
+                    "name": "{parameters.AppNSGName}",
+                    "location": "{parameters.location}",
+                    "securityRules": [
+                        {
+                            "name": "Allow_FE",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "443",
+                            "sourceAddressPrefix": "{parameters.FESubnetPrefix}",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        },
+                        {
+                            "name": "Block_RDP_Internet",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "Internet",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 101,
+                            "direction": "Inbound"
+                        },
+                        {
+                            "name": "Block_Internet_Outbound",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "Internet",
+                            "access": "Deny",
+                            "priority": 200,
+                            "direction": "Outbound"
+                        }
+                    ]
+                },
+                {
+                    "name": "{parameters.DBNSGName}",
+                    "location": "{parameters.location}",
+                    "securityRules": [
+                        {
+                            "name": "Allow_App",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "1433",
+                            "sourceAddressPrefix": "{parameters.AppSubnetPrefix}",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 100,
+                            "direction": "Inbound"
+                        },
+                        {
+                            "name": "Block_FE",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "{parameters.FESubnetPrefix}",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 101,
+                            "direction": "Inbound"
+                        },
+                        {
+                            "name": "Block_App",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "{parameters.AppSubnetPrefix}",
+                            "destinationAddressPrefix": "*",
+                            "access": "Deny",
+                            "priority": 102,
+                            "direction": "Inbound"
+                        },
+                        {
+                            "name": "Block_Internet",
+                            "protocol": "*",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "Internet",
+                            "access": "Deny",
+                            "priority": 200,
+                            "direction": "Outbound"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
