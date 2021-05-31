@@ -3,13 +3,13 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "subscriptionId": {
-            "value": "2c44f03b-1f21-4715-8b92-7eecc16f3a72"
+            "value": "__SUBSCRIPTION_ID__"
         },
         "resourceGroupName": {
-            "value": "myResourceGroup2"
+            "value": "__RESOURCE_GROUP_NAME__"
         },
         "location": {
-            "value": "westeurope"
+            "value": "__LOCATION__"
         }
     }
 }
