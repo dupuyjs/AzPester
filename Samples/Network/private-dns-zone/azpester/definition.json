@@ -1,0 +1,92 @@
+{
+    "$schema": "../../../../Source/Schemas/2021-04/schema.definition.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "privateDnsZoneName": {
+            "type": "string",
+            "defaultValue": "contoso.com"
+        },
+        "vmRegistration": {
+            "type": "bool",
+            "defaultValue": true
+        },
+        "vnetName": {
+            "type": "string",
+            "defaultValue": "VNet1"
+        },
+        "vnetAddressPrefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/16"
+        },
+        "subnet1Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.0.0/24"
+        },
+        "subnet1Name": {
+            "type": "string",
+            "defaultValue": "App"
+        },
+        "subnet2Prefix": {
+            "type": "string",
+            "defaultValue": "10.0.1.0/24"
+        },
+        "subnet2Name": {
+            "type": "string",
+            "defaultValue": "Utility"
+        },
+        "location": {
+            "type": "string"
+        },
+        "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        }
+    },
+    "contexts": {
+        "default": {
+            "subscriptionId": "{parameters.subscriptionId}",
+            "resourceGroupName": "{parameters.resourceGroupName}"
+        }
+    },
+    "definition": {
+        "network": {
+            "virtualNetworks": [
+                {
+                    "name": "{parameters.vnetName}",
+                    "location": "{parameters.location}",
+                    "addressSpace": [
+                        {
+                            "addressPrefix": "{parameters.vnetAddressPrefix}"
+                        }
+                    ],
+                    "subnets": [
+                        {
+                            "name": "{parameters.subnet1Name}",
+                            "addressPrefix": "{parameters.subnet1Prefix}"
+                        },
+                        {
+                            "name": "{parameters.subnet2Name}",
+                            "addressPrefix": "{parameters.subnet2Prefix}"
+                        }
+                    ]
+                }
+            ],
+            "privateDnsZones": [
+                {
+                    "name": "{parameters.privateDnsZoneName}",
+                    "virtualNetworkLinks": [
+                        {
+                            "name": "{parameters.privateDnsZoneName}-link",
+                            "registrationEnabled": true,
+                            "virtualNetwork": {
+                                "name": "{parameters.vnetName}"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
