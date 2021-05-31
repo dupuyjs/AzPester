@@ -24,32 +24,46 @@
                         "$ref": "#/definitions/virtualNetworkLink"
                     }
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "virtualNetworkLink": {
             "type": "object",
             "required": [
-                "name",
-                "virtualNetworkName"
+                "name"
             ],
             "properties": {
                 "name": {
                     "type": "string",
                     "description": "(Required) The name of the virtual network link."
                 },
-                "context": {
-                    "type": "string",
-                    "description": "(Optional) The context name used for this resource."
-                },
-                "virtualNetworkName": {
-                    "type": "string",
-                    "description": "(Required) The name of the linked virtual network."
+                "virtualNetwork": {
+                    "$ref": "#/definitions/virtualNetwork",
+                    "description": "(Required) The virtual network details."
                 },
                 "registrationEnabled": {
                     "type": "boolean",
                     "description": "(Optional) Is auto-registration enabled."
                 }
-            }
+            },
+            "additionalProperties": false
+        },
+        "virtualNetwork": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The name of the linked virtual network."
+                },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The context name used for this resource."
+                }
+            },
+            "additionalProperties": false
         }
     }
 }

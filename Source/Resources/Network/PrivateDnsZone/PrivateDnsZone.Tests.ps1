@@ -22,7 +22,6 @@ Describe 'Private DNS Zone <name> Acceptance Tests' -Tag 'Network' -ForEach $Pri
     Context 'Private DNS Zone <name>' {
         It 'Validate private DNS zone <name> has been provisioned' {
             $dnsZone | Should -Not -BeNullOrEmpty
-            #$dnsZone.ProvisioningState | Should -Be "Succeeded"
         }
         It 'Validate private DNS zone <propertyName> is <propertyValue>' -ForEach $properties {
             $propertyName | Should -Not -BeNullOrEmpty
@@ -41,12 +40,19 @@ Describe 'Private DNS Zone <name> Acceptance Tests' -Tag 'Network' -ForEach $Pri
             $link | Should -Not -BeNullOrEmpty
             $link.ProvisioningState | Should -Be "Succeeded"
         }
-        It 'Validate link <propertyName> is <propertyValue>' -ForEach $properties {
-            $propertyName | Should -Not -BeNullOrEmpty
-            $propertyValue | Should -Not -BeNullOrEmpty
-            if ($propertyName -eq "virtualNetworkName") {
-                $link.VirtualNetworkId.Split("/")[-1] | Should -Be $propertyValue
-            } else {
+        It 'Validate link <propertyName> is <displayValue>' -ForEach $properties {
+            if ($propertyName -eq "virtualNetwork") {
+                $virtualNetwork = Get-VirtualNetwork -Definition $Definition `
+                    -Name $propertyValue.name `
+                    -Context $propertyValue.context
+                
+                $virtualNetwork | Should -Not -BeNullOrEmpty
+                $link.VirtualNetworkId | Should -Be $virtualNetwork.Id
+                $link.VirtualNetworkLinkState | Should -Be "Completed"
+            }
+            else {
+                $propertyName | Should -Not -BeNullOrEmpty
+                $propertyValue | Should -Not -BeNullOrEmpty
                 $link.$propertyName | Should -Be $propertyValue
             }
         }

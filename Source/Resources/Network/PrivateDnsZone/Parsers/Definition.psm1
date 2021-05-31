@@ -10,10 +10,6 @@ function Find-PrivateDnsZones {
     foreach ($dnsZone in $dnsZones) {
         $properties = @()
 
-        if ($dnsZone.name) {
-            $properties += Add-Property -PropertyName 'name' -PropertyValue $dnsZone.name
-        }
-
         if ($dnsZone.location) {
             $properties += Add-Property -PropertyName 'location' -PropertyValue $dnsZone.location
         }
@@ -22,11 +18,8 @@ function Find-PrivateDnsZones {
             foreach ($link in $dnsZone.virtualNetworkLinks) {
                 $linkProperties = @()
 
-                if ($link.name) {
-                    $linkProperties += Add-Property -PropertyName 'name' -PropertyValue $link.name
-                }
-                if ($link.virtualNetworkName) {
-                    $linkProperties += Add-Property -PropertyName 'virtualNetworkName' -PropertyValue $link.virtualNetworkName
+                if ($link.PSObject.BaseObject.Contains("virtualNetwork")) {
+                    $linkProperties += Add-Property -PropertyName 'virtualNetwork' -PropertyValue $link.virtualNetwork -DisplayValue $link.virtualNetwork.name 
                 }
                 if ($link.PSObject.BaseObject.Contains("registrationEnabled")) {
                     $linkProperties += Add-Property -PropertyName 'registrationEnabled' -PropertyValue $link.registrationEnabled
@@ -49,10 +42,16 @@ function Add-Property {
         [string] $PropertyName,
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
-        [PSObject] $PropertyValue
+        [PSObject] $PropertyValue,
+        [Parameter(Mandatory = $false)]
+        [PSObject] $DisplayValue
     )
 
-    return @{propertyName = $PropertyName; propertyValue = $PropertyValue }
+    if (!$DisplayValue) {
+        $DisplayValue = $PropertyValue
+    }
+
+    return @{propertyName = $PropertyName; propertyValue = $PropertyValue; displayValue = $DisplayValue }
 }
 
 Export-ModuleMember -Function Find-PrivateDnsZones
