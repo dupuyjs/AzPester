@@ -1,5 +1,5 @@
 {
-    "$schema": "../../Source/Schemas/2021-04/schema.definition.parameters.json",
+    "$schema": "../../../../Source/Schemas/2021-04/schema.definition.parameters.json",
     "contentVersion": "1.0.0.0",
     "parameters": {
         "subscriptionId": {
@@ -7,6 +7,9 @@
         },
         "resourceGroupName": {
             "value": "__RESOURCE_GROUP_NAME__"
+        },
+        "location": {
+            "value": "__LOCATION__"
         }
     }
 }
