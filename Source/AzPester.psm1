@@ -144,7 +144,7 @@ function Assert-Parameters {
         $sourceParameters = $ParametersHash.parameters
         if ($ParametersDepl) {
             foreach ($parameter in $targetParameters.GetEnumerator()) {
-                if (!$sourceParameters.ContainsKey($parameter.key) -and !$ParametersDepl.ContainsKey($parameter.key) -and !$parameter.value.defaultValue) {
+                if (!$sourceParameters.ContainsKey($parameter.key) -and !$ParametersDepl.ContainsKey($parameter.key) -and ($null -eq $parameter.value.defaultValue)) {
                     Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
                     return $false
                 }
@@ -152,7 +152,7 @@ function Assert-Parameters {
         }
         else {
             foreach ($parameter in $targetParameters.GetEnumerator()) {
-                if (!$sourceParameters.ContainsKey($parameter.key) -and !$parameter.value.defaultValue) {
+                if (!$sourceParameters.ContainsKey($parameter.key) -and ($null -eq $parameter.value.defaultValue)) {
                     Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
                     return $false
                 }
@@ -161,7 +161,7 @@ function Assert-Parameters {
     }
     else {
         foreach ($parameter in $targetParameters.GetEnumerator()) {
-            if (!$parameter.value.defaultValue) {
+            if ($null -eq $parameter.value.defaultValue) {
                 Write-Host "Validation Failed: Input parameter $($parameter.key) value is missing." -ForegroundColor Red
                 return $false
             }
@@ -193,7 +193,7 @@ function Set-Parameters {
     }
     
     # Regular expression used to get all expression placeholders {parameters.x}
-    $results = $DefinitionJson | Select-String '{parameters.[a-zA-Z0-9_.-\[\]]+}' -AllMatches
+    $results = $DefinitionJson | Select-String '{parameters[a-zA-Z0-9_.-\[\]]+}' -AllMatches
 
     # Create an hashtable with placeholders and associated values
     $placeHolders = @{}
@@ -223,13 +223,13 @@ function Set-Parameters {
         # 1. Parameter defined in parameters file
         # 2. Parameter defined in deployment inputs
         # 3. Default value defined in definition file
-        if (${sourceParameters}?[$propertyName].value) {   
+        if ($null -ne ${sourceParameters}?[$propertyName].value) { 
             $expression = '$sourceParameters.' + $propertyName + '.value' + $arrayIndex
         }
-        elseif (${ParametersDepl}?[$propertyName].value) {
+        elseif ($null -ne ${ParametersDepl}?[$propertyName].value) { 
             $expression = '$ParametersDepl.' + $propertyName + '.value' + $arrayIndex
         }
-        elseif (${targetParameters}?[$propertyName].defaultValue) {
+        elseif ($null -ne ${targetParameters}?[$propertyName].defaultValue) {   
             $expression = '$targetParameters.' + $propertyName + '.defaultValue' + $arrayIndex
         }
         else {
@@ -249,7 +249,7 @@ function Set-Parameters {
         $value = Invoke-Expression $expression
         $placeHolders.Add($key, $value)
 
-        if (!$value) {
+        if ($null -eq $value) {
             Write-Host "Warning: Cannot evaluate placeholder expression $key. Value is null." -ForegroundColor Yellow
         }
     }

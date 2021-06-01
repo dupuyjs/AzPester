@@ -38,6 +38,19 @@ function Find-KeyVaults {
             $properties += Add-Property -PropertyName 'softDeleteRetentionInDays' -PropertyValue $keyVault.softDeleteRetentionInDays
         }
 
+        if ($null -ne $keyVault.networkAcls) {
+            $networkAclsProperties = @()
+
+            if ($null -ne $keyVault.networkAcls.bypass) {
+                $networkAclsProperties += Add-Property -PropertyName 'bypass' -PropertyValue $keyVault.networkAcls.bypass
+            }
+            if ($null -ne $keyVault.networkAcls.defaultAction) {
+                $networkAclsProperties += Add-Property -PropertyName 'defaultAction' -PropertyValue $keyVault.networkAcls.defaultAction
+            }
+
+            $keyVault.networkAclsProperties = $networkAclsProperties
+        }
+
         if ($keyVault.accessPolicies) {
             foreach ($policy in $keyVault.accessPolicies) {
                 $policyProperties = @()
@@ -53,6 +66,13 @@ function Find-KeyVaults {
                 }
                 if ($null -ne ${policy}?.permissions['storage']) {
                     $policyProperties += Add-Property -PropertyName 'permissionsToStorage' -PropertyValue $policy.permissions['storage']
+                }
+
+                if ($policy.objectId) {
+                    $policy.displayValue = $policy.objectId
+                }
+                else {
+                    $policy.displayValue = $policy.identity.name
                 }
 
                 $policy.properties = $policyProperties

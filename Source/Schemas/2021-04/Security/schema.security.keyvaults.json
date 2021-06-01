@@ -23,39 +23,95 @@
                     "description": "(Optional) The location where the key vault has been created."
                 },
                 "enabledForDeployment": {
-                    "type": "boolean",
+                    "oneOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ],
                     "description": "(Optional) Property to specify whether Azure Virtual Machines are permitted to retrieve certificates stored as secrets from the key vault."
                 },
                 "enabledForDiskEncryption": {
-                    "type": "boolean",
+                    "oneOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ],
                     "description": "(Optional) Property to specify whether Azure Disk Encryption is permitted to retrieve secrets from the vault and unwrap keys."
                 },
                 "enabledForTemplateDeployment": {
-                    "type": "boolean",
+                    "oneOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ],
                     "description": "(Optional) Property to specify whether Azure Resource Manager is permitted to retrieve secrets from the key vault."
                 },
                 "enablePurgeProtection": {
-                    "type": "boolean",
+                    "oneOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ],
                     "description": "(Optional) Property specifying whether protection against purge is enabled for this vault."
                 },
                 "enableRbacAuthorization": {
-                    "type": "boolean",
+                    "oneOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ],
                     "description": "(Optional) Property that controls how data actions are authorized. When true, the key vault will use Role Based Access Control (RBAC) for authorization of data actions, and the access policies specified in vault properties will be  ignored (warning: this is a preview feature). When false, the key vault will use the access policies specified in vault properties, and any policy stored on Azure Resource Manager will be ignored. If null or not specified, the vault is created with the default value of false. Note that management actions are always authorized with RBAC."
                 },
                 "enableSoftDelete": {
-                    "type": "boolean",
+                    "oneOf": [
+                        {
+                            "type": "boolean"
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ],
                     "description": "(Optional) Property to specify whether the 'soft delete' functionality is enabled for this key vault. If it's not set to any value(true or false) when creating new key vault, it will be set to true by default. Once set to true, it cannot be reverted to false."
                 },
                 "sku": {
-                    "type": "string",
-                    "enum": [
-                        "standard",
-                        "premium"
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "enum": [
+                                "standard",
+                                "premium"
+                            ]
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
                     ],
                     "description": "(Optional) SKU to specify whether the key vault is a standard vault or a premium vault."
                 },
                 "softDeleteRetentionInDays": {
-                    "type": "integer",
+                    "oneOf": [
+                        {
+                            "type": "integer"
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ],
                     "description": "(Optional) softDelete data retention days. It accepts >=7 and <=90."
                 },
                 "accessPolicies": {
@@ -85,17 +141,34 @@
                         "$ref": "#/definitions/certificate"
                     },
                     "description": "(Optional) List of certificates stored in the key vault."
+                },
+                "networkAcls": {
+                    "$ref": "#/definitions/networkRuleSet"
                 }
             },
             "additionalProperties": false
         },
         "accessPolicy": {
             "type": "object",
-            "required": [
-                "identity",
-                "permissions"
+            "anyOf": [
+                {
+                    "required": [
+                        "identity",
+                        "permissions"
+                    ]
+                },
+                {
+                    "required": [
+                        "objectId",
+                        "permissions"
+                    ]
+                }
             ],
             "properties": {
+                "objectId": {
+                    "type": "string",
+                    "description": "The object identifier of a User, Service Principal or Security Group."
+                },
                 "identity": {
                     "$ref": "#/definitions/identity"
                 },
@@ -103,97 +176,125 @@
                     "type": "object",
                     "properties": {
                         "keys": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "all",
-                                    "encrypt",
-                                    "decrypt",
-                                    "wrapKey",
-                                    "unwrapKey",
-                                    "sign",
-                                    "verify",
-                                    "get",
-                                    "list",
-                                    "create",
-                                    "update",
-                                    "import",
-                                    "delete",
-                                    "backup",
-                                    "restore",
-                                    "recover",
-                                    "purge"
-                                ]
-                            },
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "all",
+                                            "encrypt",
+                                            "decrypt",
+                                            "wrapKey",
+                                            "unwrapKey",
+                                            "sign",
+                                            "verify",
+                                            "get",
+                                            "list",
+                                            "create",
+                                            "update",
+                                            "import",
+                                            "delete",
+                                            "backup",
+                                            "restore",
+                                            "recover",
+                                            "purge"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "$ref": "../schema.definition.json#/definitions/expression"
+                                }
+                            ],
                             "description": "(Optional) Permissions to keys"
                         },
                         "secrets": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "all",
-                                    "get",
-                                    "list",
-                                    "set",
-                                    "delete",
-                                    "backup",
-                                    "restore",
-                                    "recover",
-                                    "purge"
-                                ]
-                            },
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "all",
+                                            "get",
+                                            "list",
+                                            "set",
+                                            "delete",
+                                            "backup",
+                                            "restore",
+                                            "recover",
+                                            "purge"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "$ref": "../schema.definition.json#/definitions/expression"
+                                }
+                            ],
                             "description": "(Optional) Permissions to secrets"
                         },
                         "certificates": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "all",
-                                    "get",
-                                    "list",
-                                    "delete",
-                                    "create",
-                                    "import",
-                                    "update",
-                                    "managecontacts",
-                                    "getissuers",
-                                    "listissuers",
-                                    "setissuers",
-                                    "deleteissuers",
-                                    "manageissuers",
-                                    "recover",
-                                    "purge",
-                                    "backup",
-                                    "restore"
-                                ]
-                            },
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "all",
+                                            "get",
+                                            "list",
+                                            "delete",
+                                            "create",
+                                            "import",
+                                            "update",
+                                            "managecontacts",
+                                            "getissuers",
+                                            "listissuers",
+                                            "setissuers",
+                                            "deleteissuers",
+                                            "manageissuers",
+                                            "recover",
+                                            "purge",
+                                            "backup",
+                                            "restore"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "$ref": "../schema.definition.json#/definitions/expression"
+                                }
+                            ],
                             "description": "(Optional) Permissions to certificates"
                         },
                         "storage": {
-                            "type": "array",
-                            "items": {
-                                "type": "string",
-                                "enum": [
-                                    "all",
-                                    "get",
-                                    "list",
-                                    "delete",
-                                    "set",
-                                    "update",
-                                    "regeneratekey",
-                                    "recover",
-                                    "purge",
-                                    "backup",
-                                    "restore",
-                                    "setsas",
-                                    "listsas",
-                                    "getsas",
-                                    "deletesas"
-                                ]
-                            },
+                            "oneOf": [
+                                {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "all",
+                                            "get",
+                                            "list",
+                                            "delete",
+                                            "set",
+                                            "update",
+                                            "regeneratekey",
+                                            "recover",
+                                            "purge",
+                                            "backup",
+                                            "restore",
+                                            "setsas",
+                                            "listsas",
+                                            "getsas",
+                                            "deletesas"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "$ref": "../schema.definition.json#/definitions/expression"
+                                }
+                            ],
                             "description": "(Optional) Permissions to storage"
                         }
                     },
@@ -219,7 +320,8 @@
                     "enum": [
                         "ManagedIdentity",
                         "ServicePrincipal",
-                        "Group"
+                        "Group",
+                        "User"
                     ]
                 },
                 "context": {
@@ -275,6 +377,43 @@
                     "description": "(Optional) The threshold in days before certificate expiration date."
                 }
             },
+            "additionalProperties": false
+        },
+        "networkRuleSet": {
+            "type": "object",
+            "properties": {
+                "bypass": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "enum": [
+                                "AzureServices",
+                                "None"
+                            ]
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ],
+                    "description": "Tells what traffic can bypass network rules. This can be 'AzureServices' or 'None'."
+                },
+                "defaultAction": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "enum": [
+                                "Allow",
+                                "Deny"
+                            ]
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ],
+                    "description": "The default action when no rule from ipRules and from virtualNetworkRules match. This is only used after the bypass property has been evaluated."
+                }
+            },
+            "description": "A set of rules governing the network accessibility of a vault.",
             "additionalProperties": false
         }
     }

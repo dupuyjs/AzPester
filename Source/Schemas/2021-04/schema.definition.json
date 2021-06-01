@@ -123,6 +123,11 @@
                 }
             },
             "additionalProperties": false
+        },
+        "expression": {
+            "type": "string",
+            "pattern": "^\\{(.*)?\\}$",
+            "description": "Expression."
         }
     }
 }

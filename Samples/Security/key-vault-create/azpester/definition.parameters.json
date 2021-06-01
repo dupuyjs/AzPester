@@ -10,6 +10,12 @@
         },
         "location": {
             "value": "__LOCATION__"
+        },
+        "keyVaultName": {
+            "value": "__KEYVAULT_NAME__"
+        },
+        "objectId": {
+            "value": "__OBJECT_ID__"
         }
     }
 }
