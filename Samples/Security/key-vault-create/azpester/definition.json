@@ -1,0 +1,94 @@
+{
+    "$schema": "../../../../Source/Schemas/2021-04/schema.definition.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "keyVaultName": {
+            "type": "string",
+            "defaultValue": "azpesterkv"
+        },
+        "enabledForDeployment": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "enabledForDiskEncryption": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "enabledForTemplateDeployment": {
+            "type": "bool",
+            "defaultValue": false
+        },
+        "objectId": {
+            "type": "string",
+            "defaultValue": "901b44ef-bbe2-49d9-925d-38c040e57d0c"
+        },
+        "keysPermissions": {
+            "type": "array",
+            "defaultValue": [
+                "get",
+                "list"
+            ]
+        },
+        "secretsPermissions": {
+            "type": "array",
+            "defaultValue": [
+                "get",
+                "list"
+            ]
+        },
+        "skuName": {
+            "type": "string",
+            "defaultValue": "Standard"
+        },
+        "secretName": {
+            "type": "string",
+            "defaultValue": "Secret1"
+        },
+        "location": {
+            "type": "string"
+        },
+        "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        }
+    },
+    "contexts": {
+        "default": {
+            "subscriptionId": "{parameters.subscriptionId}",
+            "resourceGroupName": "{parameters.resourceGroupName}"
+        }
+    },
+    "definition": {
+        "security": {
+            "keyVaults": [
+                {
+                    "name": "{parameters.keyVaultName}",
+                    "enabledForDeployment": "{parameters.enabledForDeployment}",
+                    "enabledForDiskEncryption": "{parameters.enabledForDiskEncryption}",
+                    "enabledForTemplateDeployment": "{parameters.enabledForTemplateDeployment}",
+                    "sku": "{parameters.skuName}",
+                    "networkAcls": {
+                        "bypass": "AzureServices",
+                        "defaultAction": "Allow"
+                    },
+                    "accessPolicies": [
+                        {
+                            "objectId": "{parameters.objectId}",
+                            "permissions": {
+                                "keys": "{parameters.keysPermissions}",
+                                "secrets": "{parameters.secretsPermissions}"
+                            }
+                        }
+                    ],
+                    "secrets": [
+                        {
+                            "name": "{parameters.secretName}"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

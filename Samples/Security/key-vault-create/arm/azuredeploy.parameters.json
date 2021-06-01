@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "keyVaultName": {
+        "value": "azpesterkv"
+      },
+      "objectId": {
+        "value": "901b44ef-bbe2-49d9-925d-38c040e57d0c"
+      },
+      "secretName": {
+        "value": "Secret1"
+      },
+      "secretValue": {
+        "value": "Secret1-Value"
+      }
+    }
+  }
