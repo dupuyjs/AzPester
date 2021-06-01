@@ -193,7 +193,7 @@ function Set-Parameters {
     }
     
     # Regular expression used to get all expression placeholders {parameters.x}
-    $results = $DefinitionJson | Select-String '{parameters.[a-zA-Z0-9_.-\[\]]+}' -AllMatches
+    $results = $DefinitionJson | Select-String '{parameters[a-zA-Z0-9_.-\[\]]+}' -AllMatches
 
     # Create an hashtable with placeholders and associated values
     $placeHolders = @{}
@@ -223,13 +223,13 @@ function Set-Parameters {
         # 1. Parameter defined in parameters file
         # 2. Parameter defined in deployment inputs
         # 3. Default value defined in definition file
-        if (${sourceParameters}?[$propertyName].value) {   
+        if ($null -ne ${sourceParameters}?[$propertyName].value) { 
             $expression = '$sourceParameters.' + $propertyName + '.value' + $arrayIndex
         }
-        elseif (${ParametersDepl}?[$propertyName].value) {
+        elseif ($null -ne ${ParametersDepl}?[$propertyName].value) { 
             $expression = '$ParametersDepl.' + $propertyName + '.value' + $arrayIndex
         }
-        elseif (${targetParameters}?[$propertyName].defaultValue) {
+        elseif ($null -ne ${targetParameters}?[$propertyName].defaultValue) {   
             $expression = '$targetParameters.' + $propertyName + '.defaultValue' + $arrayIndex
         }
         else {
@@ -249,7 +249,7 @@ function Set-Parameters {
         $value = Invoke-Expression $expression
         $placeHolders.Add($key, $value)
 
-        if (!$value) {
+        if ($null -eq $value) {
             Write-Host "Warning: Cannot evaluate placeholder expression $key. Value is null." -ForegroundColor Yellow
         }
     }
