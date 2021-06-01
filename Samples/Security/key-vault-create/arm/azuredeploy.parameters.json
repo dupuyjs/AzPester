@@ -3,16 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
       "keyVaultName": {
-        "value": "azpesterkv"
+        "value": "GEN-UNIQUE"
       },
       "objectId": {
-        "value": "901b44ef-bbe2-49d9-925d-38c040e57d0c"
+        "value": "GEN-AZUREAD-OBJECTID"
       },
       "secretName": {
-        "value": "Secret1"
+        "value": "GEN-UNIQUE"
       },
       "secretValue": {
-        "value": "Secret1-Value"
+        "value": "GEN-UNIQUE"
       }
     }
   }

@@ -3,8 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "keyVaultName": {
-            "type": "string",
-            "defaultValue": "azpesterkv"
+            "type": "string"
         },
         "enabledForDeployment": {
             "type": "bool",
@@ -19,8 +18,7 @@
             "defaultValue": false
         },
         "objectId": {
-            "type": "string",
-            "defaultValue": "901b44ef-bbe2-49d9-925d-38c040e57d0c"
+            "type": "string"
         },
         "keysPermissions": {
             "type": "array",
