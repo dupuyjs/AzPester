@@ -4,6 +4,7 @@ class IdentityTypes {
     static [string] $ServicePrincipal = 'ServicePrincipal'
     static [string] $ManagedIdentity = 'ManagedIdentity'
     static [string] $Group = 'Group'
+    static [string] $User = 'User'
 }
 
 function Get-IdentityTypes {
@@ -35,6 +36,10 @@ function Get-IdentityObjectId {
     }
     elseif($Type -eq (Get-IdentityTypes)::Group) {
         $identity = Get-AzADGroup -DisplayName $name
+        return $identity.Id
+    }
+    elseif($Type -eq (Get-IdentityTypes)::User) {
+        $identity = Get-AzADUser -DisplayName $name
         return $identity.Id
     }
     else {
