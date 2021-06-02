@@ -60,7 +60,7 @@ jobs:
           azPSVersion: '5.8.0'
           inlineScript: |      
             New-AzResourceGroup -Name ${{env.RESOURCE_GROUP_NAME}} -Location ${{env.LOCATION}}
-            New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile "${{github.workspace}}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
+            New-AzResourceGroupDeployment -ResourceGroupName ${{env.RESOURCE_GROUP_NAME} -TemplateFile "${{github.workspace}}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
           
       - name: Test rg-vnet-two-subnets
         uses: azure/powershell@v1
