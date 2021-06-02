@@ -24,19 +24,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout the repo
-        uses: actions/checkout@v2
-            
-      - name: Login via Az module
-        uses: azure/login@v1
-        with:
-          creds: ${{secrets.AZURE_CREDENTIALS}}
-          enable-AzPSSession: true
+        uses: actions/checkout@v2 
           
       - name: Run Azure PowerShell script
         uses: azure/powershell@v1
         with:
           azPSVersion: '5.8.0'
           inlineScript: |
-            $resourceGroupName = "rg-vnet-two-subnets"
-            New-AzResourceGroup -Name $resourceGroupName -Location "West Europe"
-            New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile "${{github.workspace}}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
+            Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+            Find-Module -Name Az | Install-Module -Scope CurrentUser
+            Find-Module -Name Pester | Install-Module -Scope CurrentUser
+            
+            Import-Module "${{github.workspace}}\Source\AzPester.psm1"
