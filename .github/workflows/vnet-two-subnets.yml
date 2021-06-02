@@ -68,6 +68,6 @@ jobs:
         with:
           azPSVersion: '5.8.0'
           inlineScript: |      
-            Remove-AzResourceGroup -Name ${{env.RESOURCE_GROUP_NAME}}
+            Remove-AzResourceGroup -Name ${{env.RESOURCE_GROUP_NAME}} -Force
             
 
