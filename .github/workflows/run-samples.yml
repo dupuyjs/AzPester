@@ -23,6 +23,9 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+      
       - name: Login via Az module
         uses: azure/login@v1
         with:
@@ -34,4 +37,4 @@ jobs:
         with:
           azPSVersion: '3.1.0'
           inlineScript: |
-            Get-AzContext
+            New-AzResourceGroupDeployment -ResourceGroupName "rg-vnet-two-subnets" -TemplateFile "$GITHUB_WORKSPACE\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
