@@ -34,9 +34,9 @@ jobs:
         with:
           files: '${{github.workspace}}/Samples/Network/vnet-two-subnets/azpester/definition.parameters.json'
         env:
-          subscriptionId.value: ${{secrets.SUBSCRIPTION_ID}}
-          resourceGroupName.value: ${{env.RESOURCE_GROUP_NAME}}
-          location.value: ${{env.LOCATION}}
+          parameters.subscriptionId.value: ${{secrets.SUBSCRIPTION_ID}}
+          parameters.resourceGroupName.value: ${{env.RESOURCE_GROUP_NAME}}
+          parameters.location.value: ${{env.LOCATION}}
       
       - name: Login
         uses: azure/login@v1
