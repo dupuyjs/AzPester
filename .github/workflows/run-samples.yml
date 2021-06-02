@@ -35,7 +35,7 @@ jobs:
       - name: Run Azure PowerShell script
         uses: azure/powershell@v1
         with:
-          azPSVersion: '7.1.0'
+          azPSVersion: '5.8.0'
           inlineScript: |
             $resourceGroupName = "rg-vnet-two-subnets"
             New-AzResourceGroup -Name $resourceGroupName -Location "West Europe"
