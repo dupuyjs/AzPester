@@ -51,7 +51,7 @@ jobs:
             New-AzResourceGroup -Name $resourceGroupName -Location "West Europe"
             New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile "${{github.workspace}}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
             
-      - name: Test rg-vnet-two-subnets
+      - name: Substitute default parameters
         uses: microsoft/variable-substitution@v1
         with:
           files: '${{github.workspace}}\Samples\Network\vnet-two-subnets\azpester\definition.parameters.json'
@@ -59,5 +59,13 @@ jobs:
           subscriptionId.value: ${{secrets.SUBSCRIPTION_ID}}
           resourceGroupName.value: $resourceGroupName
           location.value: "westeurope"
+          
+      - name: Test rg-vnet-two-subnets
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: '5.8.0'
+          inlineScript: |      
+            cd "${{github.workspace}}\Samples\Network\vnet-two-subnets\azpester"
+            Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json
             
 
