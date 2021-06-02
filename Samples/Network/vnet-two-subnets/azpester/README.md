@@ -1,5 +1,7 @@
 # Virtual Network with two Subnets
 
+[![CI vnet-two-subnets](https://github.com/dupuyjs/AzPester/actions/workflows/vnet-two-subnets.yml/badge.svg)](https://github.com/dupuyjs/AzPester/actions/workflows/vnet-two-subnets.yml)
+
 ## Usage
 
 ```Powershell
