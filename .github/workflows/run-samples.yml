@@ -25,14 +25,39 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout the repo
         uses: actions/checkout@v2 
+      
+      - name: Login
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+          enable-AzPSSession: true
           
-      - name: Run Azure PowerShell script
+      - name: Install AzPester
         uses: azure/powershell@v1
         with:
           azPSVersion: '5.8.0'
           inlineScript: |
             Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
             Find-Module -Name Az | Install-Module -Scope CurrentUser
-            Find-Module -Name Pester | Install-Module -Scope CurrentUser
-            
+            Find-Module -Name Pester | Install-Module -Scope CurrentUser 
             Import-Module "${{github.workspace}}\Source\AzPester.psm1"
+            
+      - name: Deploy rg-vnet-two-subnets
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: '5.8.0'
+          inlineScript: |      
+            $resourceGroupName = "rg-vnet-two-subnets"
+            New-AzResourceGroup -Name $resourceGroupName -Location "West Europe"
+            New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile "${{github.workspace}}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
+            
+      - name: Test rg-vnet-two-subnets
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '${{github.workspace}}\Samples\Network\vnet-two-subnets\azpester\definition.parameters.json'
+        env:
+          subscriptionId.value: ${{secrets.SUBSCRIPTION_ID}}
+          resourceGroupName.value: $resourceGroupName
+          location.value: "westeurope"
+            
+
