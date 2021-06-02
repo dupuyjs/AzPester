@@ -63,4 +63,11 @@ jobs:
             cd "${{github.workspace}}\Samples\Network\vnet-two-subnets\azpester"
             Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json
             
+      - name: Clean
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: '5.8.0'
+          inlineScript: |      
+            Remove-AzResourceGroup -Name ${{env.RESOURCE_GROUP_NAME}}
+            
 
