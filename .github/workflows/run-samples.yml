@@ -25,13 +25,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout the repo
         uses: actions/checkout@v2
-      
-      - name: Run Azure PowerShell script
-        uses: azure/powershell@v1
-        with:
-          azPSVersion: '3.1.0'
-          inlineScript: |
-            "${{ github.workspace }}"
             
       - name: Login via Az module
         uses: azure/login@v1
@@ -42,6 +35,8 @@ jobs:
       - name: Run Azure PowerShell script
         uses: azure/powershell@v1
         with:
-          azPSVersion: '3.1.0'
+          azPSVersion: '7.1.0'
           inlineScript: |
-            New-AzResourceGroupDeployment -ResourceGroupName "rg-vnet-two-subnets" -TemplateFile "${{ github.workspace }}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
+            $resourceGroupName = "rg-vnet-two-subnets"
+            New-AzResourceGroup -Name $resourceGroupName -Location "West Europe"
+            New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile "${{github.workspace}}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
