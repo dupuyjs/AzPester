@@ -26,6 +26,14 @@ jobs:
       - name: Checkout the repo
         uses: actions/checkout@v2
       
+      - name: Run Azure PowerShell script
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: '3.1.0'
+          inlineScript: |
+            Write-Host $github.workspace
+            Write-Host "${github.workspace}"
+            
       - name: Login via Az module
         uses: azure/login@v1
         with:
@@ -37,4 +45,4 @@ jobs:
         with:
           azPSVersion: '3.1.0'
           inlineScript: |
-            New-AzResourceGroupDeployment -ResourceGroupName "rg-vnet-two-subnets" -TemplateFile "${{github.workspace}}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
+            New-AzResourceGroupDeployment -ResourceGroupName "rg-vnet-two-subnets" -TemplateFile "${github.workspace}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
