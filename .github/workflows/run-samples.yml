@@ -52,8 +52,7 @@ jobs:
             Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
             Find-Module -Name Az | Install-Module -Scope CurrentUser
             Find-Module -Name Pester | Install-Module -Scope CurrentUser 
-            Import-Module "${{github.workspace}}\Source\AzPester.psm1"
-            
+                      
       - name: Deploy rg-vnet-two-subnets
         uses: azure/powershell@v1
         with:
@@ -66,7 +65,8 @@ jobs:
         uses: azure/powershell@v1
         with:
           azPSVersion: '5.8.0'
-          inlineScript: |      
+          inlineScript: |
+            Import-Module "${{github.workspace}}\Source\AzPester.psm1"
             cd "${{github.workspace}}\Samples\Network\vnet-two-subnets\azpester"
             Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json
             
