@@ -31,8 +31,7 @@ jobs:
         with:
           azPSVersion: '3.1.0'
           inlineScript: |
-            $github.workspace
-            "${github.workspace}"
+            "${{ github.workspace }}"
             
       - name: Login via Az module
         uses: azure/login@v1
@@ -45,4 +44,4 @@ jobs:
         with:
           azPSVersion: '3.1.0'
           inlineScript: |
-            New-AzResourceGroupDeployment -ResourceGroupName "rg-vnet-two-subnets" -TemplateFile "${github.workspace}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
+            New-AzResourceGroupDeployment -ResourceGroupName "rg-vnet-two-subnets" -TemplateFile "${{ github.workspace }}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
