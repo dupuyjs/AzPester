@@ -185,6 +185,72 @@ function Set-Parameters {
         [PSObject] $ParametersDepl
     )
 
+    $placeholders = Get-ExpressionPlaceholders `
+        -DefinitionJson $definitionJson `
+        -DefinitionHash $definitionHash `
+        -ParametersHash $parametersHash `
+        -ParametersDepl $parametersDepl
+
+    # Regular expression used to get all expression placeholders "{parameters.x}" (including double quote)
+    # Used to fill parameters, even for complex types
+    $results = $DefinitionJson | Select-String '"{parameters[a-zA-Z0-9_.\-\[\]]+}"' -AllMatches
+    $parameters = @{}
+
+    foreach ($match in $results.Matches) {
+        $key = $match.Value
+
+        if ($parameters.ContainsKey($key)) {
+            continue
+        }
+
+        $trim = $key.Trim('"', '"')
+        $value = ($placeholders[$trim] | ConvertTo-Json)
+        $parameters.Add($key, $value)
+    }
+
+    # Update json file with parameters values
+    foreach ($parameters in $parameters.GetEnumerator()) {
+        $DefinitionJson = $DefinitionJson -replace [regex]::Escape($parameters.key), $parameters.value
+    }
+
+    # Regular expression used to get all expression placeholders {parameters.x} (without double quote)
+    # Used for string concatenation
+    $results = $DefinitionJson | Select-String '{parameters[a-zA-Z0-9_.\-\[\]]+}' -AllMatches
+    $parameters = @{}
+
+    foreach ($match in $results.Matches) {
+        $key = $match.Value
+
+        if ($parameters.ContainsKey($key)) {
+            continue
+        }
+
+        $value = $placeholders[$key]
+        $parameters.Add($key, $value)
+    }
+
+    # Update json file with parameters values
+    foreach ($parameters in $parameters.GetEnumerator()) {
+        $DefinitionJson = $DefinitionJson -replace [regex]::Escape($parameters.key), $parameters.value
+    }
+
+    return ($DefinitionJson | ConvertFrom-Json -AsHashtable)
+}
+
+function Get-ExpressionPlaceholders {
+    param(
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [String] $DefinitionJson,
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        [PSObject] $DefinitionHash,
+        [Parameter(Mandatory = $false)]
+        [PSObject] $ParametersHash,
+        [Parameter(Mandatory = $false)]
+        [PSObject] $ParametersDepl
+    )
+
     $targetParameters = $DefinitionHash.parameters
     
     # Parameters file is optional
@@ -193,21 +259,21 @@ function Set-Parameters {
     }
     
     # Regular expression used to get all expression placeholders {parameters.x}
-    $results = $DefinitionJson | Select-String '{parameters[a-zA-Z0-9_.-\[\]]+}' -AllMatches
+    $results = $DefinitionJson | Select-String '{parameters[a-zA-Z0-9_.\-\[\]]+}' -AllMatches
 
-    # Create an hashtable with placeholders and associated values
-    $placeHolders = @{}
+    # Create an hashtable with expressions and associated values
+    $placeholders = @{}
     foreach ($match in $results.Matches) {
         $key = $match.Value
 
-        if ($placeHolders.ContainsKey($key)) {
+        if ($placeholders.ContainsKey($key)) {
             continue
         }
 
         $trim = $key.Trim('{', '}')
         $split = $trim.Split('.')
 
-        # Identify if our base property is an array {parameters.x[1]}
+        # Identify if our expression is an array {parameters.x[1]}
         $searchIndex = $split[1] | Select-String '\[[0-9]+\]'
         if ($null -ne $searchIndex.Matches) {
             $arrayIndex = $searchIndex.Matches[0].Value
@@ -247,19 +313,14 @@ function Set-Parameters {
 
         # Invoke expression
         $value = Invoke-Expression $expression
-        $placeHolders.Add($key, $value)
+        $placeholders.Add($key, $value)
 
         if ($null -eq $value) {
             Write-Host "Warning: Cannot evaluate placeholder expression $key. Value is null." -ForegroundColor Yellow
         }
     }
 
-    # Update json file with placeholder values
-    foreach ($placeHolder in $placeHolders.GetEnumerator()) {
-        $DefinitionJson = $DefinitionJson -replace [regex]::Escape($placeHolder.key), $placeHolder.value
-    }
-
-    return ($DefinitionJson | ConvertFrom-Json -AsHashtable)
+    return $placeholders
 }
 
 function Get-Contexts {

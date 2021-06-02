@@ -60,10 +60,6 @@ Describe 'Key Vault <name> Acceptance Tests' -Tag 'Security' -ForEach $KeyVaults
         It 'Validate access policies <propertyName> is <propertyValue>' -ForEach $properties {
             $propertyName | Should -Not -BeNullOrEmpty
             $propertyValue | Should -Not -BeNullOrEmpty
-
-            if($propertyValue.GetType().Name -eq "String") {
-                $propertyValue = $propertyValue.Split()
-            }
             
             ($policy.$propertyName | Sort-Object) | Should -Be ($propertyValue | Sort-Object)
         }
