@@ -19,12 +19,24 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    env:
+      RESOURCE_GROUP_NAME: "rg-vnet-two-subnets"
+      LOCATION: "westeurope"
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout the repo
-        uses: actions/checkout@v2 
+        uses: actions/checkout@v2
+        
+      - name: Substitute default parameters
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '${{github.workspace}}/Samples/Network/vnet-two-subnets/azpester/definition.parameters.json'
+        env:
+          subscriptionId.value: ${{secrets.SUBSCRIPTION_ID}}
+          resourceGroupName.value: ${{env.RESOURCE_GROUP_NAME}}
+          location.value: ${{env.LOCATION}}
       
       - name: Login
         uses: azure/login@v1
@@ -47,18 +59,8 @@ jobs:
         with:
           azPSVersion: '5.8.0'
           inlineScript: |      
-            $resourceGroupName = "rg-vnet-two-subnets"
-            New-AzResourceGroup -Name $resourceGroupName -Location "West Europe"
+            New-AzResourceGroup -Name ${{env.RESOURCE_GROUP_NAME}} -Location ${{env.LOCATION}}
             New-AzResourceGroupDeployment -ResourceGroupName $resourceGroupName -TemplateFile "${{github.workspace}}\Samples\Network\vnet-two-subnets\arm\azuredeploy.json"
-            
-      - name: Substitute default parameters
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: '${{github.workspace}}\Samples\Network\vnet-two-subnets\azpester\definition.parameters.json'
-        env:
-          subscriptionId.value: ${{secrets.SUBSCRIPTION_ID}}
-          resourceGroupName.value: $resourceGroupName
-          location.value: "westeurope"
           
       - name: Test rg-vnet-two-subnets
         uses: azure/powershell@v1
