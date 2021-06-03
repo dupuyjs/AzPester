@@ -1,5 +1,7 @@
 # Azure private DNS zone
 
+[![CI private-dns-zone](https://github.com/dupuyjs/AzPester/actions/workflows/private-dns-zone.yml/badge.svg)](https://github.com/dupuyjs/AzPester/actions/workflows/private-dns-zone.yml)
+
 ## Usage
 
 ```Powershell

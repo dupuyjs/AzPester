@@ -1,5 +1,7 @@
 # Multi tier VNet with NSGs and DMZ
 
+[![CI nsg-dmz-in-vnet](https://github.com/dupuyjs/AzPester/actions/workflows/nsg-dmz-in-vnet.yml/badge.svg)](https://github.com/dupuyjs/AzPester/actions/workflows/nsg-dmz-in-vnet.yml)
+
 ## Usage
 
 ```Powershell
