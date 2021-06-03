@@ -27,14 +27,17 @@ jobs:
           inlineScript: |
             Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
             Find-Module -Name Az | Install-Module -Scope CurrentUser
-            Find-Module -Name Pester | Install-Module -Scope CurrentUser 
+            Find-Module -Name Pester | Install-Module -Scope CurrentUser
+
+      - name: Generate key vault unique name
+        run: echo KEYVAULT_NAME=kv$(date +%s) >> $GITHUB_ENV
 
       - name: Substitute default parameters (arm template)
         uses: microsoft/variable-substitution@v1
         with:
           files: '${{github.workspace}}/Samples/microsoft.keyvault/key-vault-create/arm/azuredeploy.parameters.json'
         env:
-          parameters.keyVaultName.value: "azpesterkv"
+          parameters.keyVaultName.value: ${{env.KEYVAULT_NAME}}
           parameters.objectId.value: ${{secrets.SP_OBJECT_ID}}
           parameters.secretName.value: "Secret1"
           parameters.secretValue.value: "Secret1-Value"
@@ -44,7 +47,7 @@ jobs:
         with:
           files: '${{github.workspace}}/Samples/microsoft.keyvault/key-vault-create/azpester/definition.parameters.json'
         env:
-          parameters.keyVaultName.value: "azpesterkv"
+          parameters.keyVaultName.value: ${{env.KEYVAULT_NAME}}
           parameters.objectId.value: ${{secrets.SP_OBJECT_ID}}
           parameters.subscriptionId.value: ${{secrets.SUBSCRIPTION_ID}}
           parameters.resourceGroupName.value: ${{env.RESOURCE_GROUP_NAME}}
