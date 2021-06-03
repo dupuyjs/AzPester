@@ -1,0 +1,84 @@
+name: CI key-vault-create
+
+on:
+  push:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    env:
+      RESOURCE_GROUP_NAME: "rg-key-vault-create"
+      LOCATION: "westeurope"
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v2
+        
+      - name: Install dependencies
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: '5.8.0'
+          inlineScript: |
+            Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted
+            Find-Module -Name Az | Install-Module -Scope CurrentUser
+            Find-Module -Name Pester | Install-Module -Scope CurrentUser 
+
+      - name: Substitute default parameters (arm template)
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '${{github.workspace}}/Samples/microsoft.keyvault/key-vault-create/arm/azuredeploy.parameters.json'
+        env:
+          parameters.keyVaultName.value: "azpesterkv"
+          parameters.objectId.value: ${{secrets.SP_OBJECT_ID}}
+          parameters.secretName.value: "Secret1"
+          parameters.secretValue.value: "Secret1-Value"
+
+      - name: Substitute default parameters (azpester)
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: '${{github.workspace}}/Samples/microsoft.keyvault/key-vault-create/azpester/definition.parameters.json'
+        env:
+          parameters.keyVaultName.value: "azpesterkv"
+          parameters.objectId.value: ${{secrets.SP_OBJECT_ID}}
+          parameters.subscriptionId.value: ${{secrets.SUBSCRIPTION_ID}}
+          parameters.resourceGroupName.value: ${{env.RESOURCE_GROUP_NAME}}
+          parameters.location.value: ${{env.LOCATION}}
+
+      - name: Login
+        uses: azure/login@v1
+        with:
+          creds: ${{secrets.AZURE_CREDENTIALS}}
+          enable-AzPSSession: true
+               
+      - name: Deploy template
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: '5.8.0'
+          inlineScript: |      
+            New-AzResourceGroup -Name ${{env.RESOURCE_GROUP_NAME}} -Location ${{env.LOCATION}}
+            cd "${{github.workspace}}\Samples\microsoft.keyvault\key-vault-create\arm"
+            New-AzResourceGroupDeployment -ResourceGroupName ${{env.RESOURCE_GROUP_NAME}} -TemplateFile azuredeploy.json -TemplateParameterFile azuredeploy.parameters.json
+          
+      - name: Test
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: '5.8.0'
+          inlineScript: |
+            Import-Module "${{github.workspace}}\Source\AzPester.psm1"
+            cd "${{github.workspace}}\Samples\microsoft.keyvault\key-vault-create\azpester"
+            Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json
+            
+      - name: Clean
+        uses: azure/powershell@v1
+        with:
+          azPSVersion: '5.8.0'
+          inlineScript: |      
+            Remove-AzResourceGroup -Name ${{env.RESOURCE_GROUP_NAME}} -Force
+            
+
