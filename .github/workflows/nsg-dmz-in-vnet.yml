@@ -3,8 +3,6 @@ name: CI nsg-dmz-in-vnet
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -34,7 +32,7 @@ jobs:
       - name: Substitute default parameters
         uses: microsoft/variable-substitution@v1
         with:
-          files: '${{github.workspace}}/Samples/Network/nsg-dmz-in-vnet/azpester/definition.parameters.json'
+          files: '${{github.workspace}}/Samples/microsoft.network/nsg-dmz-in-vnet/azpester/definition.parameters.json'
         env:
           parameters.subscriptionId.value: ${{secrets.SUBSCRIPTION_ID}}
           parameters.resourceGroupName.value: ${{env.RESOURCE_GROUP_NAME}}
@@ -52,7 +50,7 @@ jobs:
           azPSVersion: '5.8.0'
           inlineScript: |      
             New-AzResourceGroup -Name ${{env.RESOURCE_GROUP_NAME}} -Location ${{env.LOCATION}}
-            New-AzResourceGroupDeployment -ResourceGroupName ${{env.RESOURCE_GROUP_NAME}} -TemplateFile "${{github.workspace}}\Samples\Network\nsg-dmz-in-vnet\arm\azuredeploy.json"
+            New-AzResourceGroupDeployment -ResourceGroupName ${{env.RESOURCE_GROUP_NAME}} -TemplateFile "${{github.workspace}}\Samples\microsoft.network\nsg-dmz-in-vnet\arm\azuredeploy.json"
           
       - name: Test
         uses: azure/powershell@v1
@@ -60,7 +58,7 @@ jobs:
           azPSVersion: '5.8.0'
           inlineScript: |
             Import-Module "${{github.workspace}}\Source\AzPester.psm1"
-            cd "${{github.workspace}}\Samples\Network\nsg-dmz-in-vnet\azpester"
+            cd "${{github.workspace}}\Samples\microsoft.network\nsg-dmz-in-vnet\azpester"
             Invoke-AzPester -Definition definition.json -Parameters definition.parameters.json
             
       - name: Clean

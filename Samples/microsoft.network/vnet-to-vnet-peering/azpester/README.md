@@ -1,5 +1,7 @@
 # VNET to VNET connection
 
+[![CI vnet-to-vnet-peering](https://github.com/dupuyjs/AzPester/actions/workflows/vnet-to-vnet-peering.yml/badge.svg)](https://github.com/dupuyjs/AzPester/actions/workflows/vnet-to-vnet-peering.yml)
+
 ## Usage
 
 ```Powershell
