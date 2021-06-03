@@ -1,5 +1,7 @@
 # Create an Azure Key Vault
 
+[![CI key-vault-create](https://github.com/dupuyjs/AzPester/actions/workflows/key-vault-create.yml/badge.svg)](https://github.com/dupuyjs/AzPester/actions/workflows/key-vault-create.yml)
+
 ## Usage
 
 ```Powershell
