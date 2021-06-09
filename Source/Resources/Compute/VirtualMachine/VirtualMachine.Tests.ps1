@@ -122,8 +122,21 @@ Describe 'Virtual Machine <name> Acceptance Tests' -Tag 'Compute' -ForEach $Virt
         }
 
         It 'Validate auto shutdown <propertyName> is <propertyValue>' -TestCases $case_autoShutdown {
-            $vmScheduleProperties.taskType | Should -Be 'ComputeVmShutdownTask'
-            $vmScheduleProperties.$propertyName | Should -Be $propertyValue
+            if ($propertyName -eq 'status') {
+                if($propertyName -eq 'Disabled') {
+                    if($vmScheduleProperties) {
+                        $vmScheduleProperties.taskType | Should -Be 'ComputeVmShutdownTask'
+                        $vmScheduleProperties.$propertyName | Should -Be $propertyValue
+                    }
+                    else {
+                        $vmScheduleProperties | Should -BeNullOrEmpty
+                    }
+                }
+            }
+            else {
+                $vmScheduleProperties.taskType | Should -Be 'ComputeVmShutdownTask'
+                $vmScheduleProperties.$propertyName | Should -Be $propertyValue
+            }
         }
     }
 }
