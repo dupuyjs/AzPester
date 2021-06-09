@@ -10,7 +10,7 @@ BeforeDiscovery {
 }
 
 BeforeAll { 
-    . $PSScriptRoot/VirtualMachine.ps1
+    . $PSScriptRoot/../Compute.ps1
 }
 
 Describe 'Virtual Machine <name> Acceptance Tests' -Tag 'Compute' -ForEach $VirtualMachines {
@@ -22,49 +22,109 @@ Describe 'Virtual Machine <name> Acceptance Tests' -Tag 'Compute' -ForEach $Virt
     Context 'Virtual Machine <name>' {
         It 'Validate virtual machine <name> has been provisioned' {
             $vm | Should -Not -BeNullOrEmpty
+            $vm.ProvisioningState | Should -Be 'Succeeded'
         }
 
-        It 'Validate virtual machine <name> has the expected size' -TestCases $case_vmSize {
-            $vm.HardwareProfile.VmSize | Should -Be $vmSize
+        It 'Validate virtual machine location is <propertyValue>' -TestCases $case_location {
+            $propertyValue | Should -Not -BeNullOrEmpty
+            $vm.Location | Should -Be $propertyValue
+        }
+    }
+
+    Context 'Virtual Machine <name> Hardware Profile' {
+        BeforeAll {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+            $vmHardwareProfile = $vm.HardwareProfile
         }
 
-        It 'Validate virtual machine <name> has the expected image reference' -TestCases $case_imageReference {
-            if ($imageReference.gallery) {
-                $image = Get-GalleryImage -Definition $Definition -GalleryName $imageReference.gallery -ImageName $imageReference.name -ImageVersion $imageReference.version -Context $imageReference.context
+        It 'Validate virtual machine size is <propertyValue>' -TestCases $case_vmSize {
+            $propertyValue | Should -Not -BeNullOrEmpty
+            $vmHardwareProfile.VmSize | Should -Be $propertyValue
+        }
+    }
+
+    Context 'Virtual Machine <name> Storage Profile' {
+        BeforeAll {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+            $vmImageReference = $vm.StorageProfile.ImageReference
+        }
+
+        It 'Validate image reference is <displayValue>' -TestCases $case_imageReference {
+            $propertyValue | Should -Not -BeNullOrEmpty
+
+            if ($propertyValue.publisher) {
+                $vmImageReference.Publisher | Should -Be $propertyValue.publisher
+                $vmImageReference.Offer | Should -Be $propertyValue.offer
+                $vmImageReference.Sku | Should -Be $propertyValue.sku
+                $vmImageReference.Version | Should -Be $propertyValue.version
+            }
+
+            if ($propertyValue.gallery) {
+                $image = Get-GalleryImage `
+                    -Definition $Definition `
+                    -GalleryName $propertyValue.gallery `
+                    -ImageName $propertyValue.name `
+                    -ImageVersion $propertyValue.version `
+                    -Context $propertyValue.context
+    
                 $image | Should -Not -BeNullOrEmpty
-                $vm.StorageProfile.ImageReference.Id | Should -Be $image.Id
-            } elseif ($imageReference.publisher) {
-                # TODO
-            } else {
-                throw 'imageReference settings are invalid'
+                $vmImageReference.Id | Should -Be $image.Id
+            }
+        }
+    }
+
+    Context 'Virtual Machine <name> Network Profile' {
+        BeforeAll {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+            $vmNetworkInterfaces = $vm.NetworkProfile.NetworkInterfaces
+        }
+
+        It 'Validate network interfaces contains <name>' -ForEach $networkProfile.networkInterfaces {
+            $nic = Get-NetworkInterface -Definition $Definition -Name $name -Context $context
+            $nic | Should -Not -BeNullOrEmpty
+            $vmNetworkInterfaces.Id | Should -Contain $nic.Id
+        }
+    }
+
+    Context 'Virtual Machine <name> Identity' {
+        BeforeAll {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+            $vmIdentity = $vm.Identity
+        }
+
+        It 'Validate identity type is <propertyValue>' -ForEach $case_identityType {
+            $propertyValue | Should -Not -BeNullOrEmpty
+
+            if ($propertyValue -eq 'None') {
+                $vmIdentity | Should -BeNullOrEmpty
+            }
+            elseif ($propertyValue -eq 'SystemAssigned, UserAssigned') {
+                $type = 'SystemAssignedUserAssigned'
+                $vmIdentity.Type | Should -Be $type
+            }
+            else {
+                $vmIdentity.Type | Should -Be $propertyValue
             }
         }
 
-        It 'Validate virtual machine <name> has the expected network profile' -TestCases $case_networkProfile {
-            $vmSubnets = Get-VirtualMachineSubnets -Definition $Definition -Name $vm.name
-
-            $vnet = $vmSubnets | Where-Object {$vnet -eq $virtualNetwork}
-            $vnet | Should -Not -BeNullOrEmpty
-
-            $subnet = $vnet | Where-Object {$subnet -eq $subnet}
-            $subnet | Should -Not -BeNullOrEmpty
-        }
-
-        It 'Validate virtual machine <name> has the expected auto shutdown settings' -TestCases $case_autoShutdown {
-            $scheduleProperties = Get-ScheduleProperties -Definition $Definition -TargetResourceId $vm.Id
-            $shutdownDailyRecurrence = $autoShutdown.dailyRecurrence
-
-            $scheduleProperties.taskType | Should -Be 'ComputeVmShutdownTask'
-            $scheduleProperties.status | Should -Be 'Enabled'
-            $scheduleProperties.dailyRecurrence | Should -Be "@{time=$shutdownDailyRecurrence}"
-            $scheduleProperties.timeZoneId | Should -Be $autoShutdown.timeZone
-        }
-
-        It 'Validate virtual machine <name> has the expected User Assigned Managed Identity' -TestCases $case_userAssignedIdentity {
-            $identity = Get-UserAssignedIdentity -Definition $Definition -IdentityName $userAssignedIdentity
+        It 'Validate user assigned identities contains <name>' -ForEach $identity.userAssignedIdentities {
+            $identity = Get-UserAssignedIdentity -Definition $Definition -IdentityName $name -Context $context
 
             $identity | Should -Not -BeNullOrEmpty
-            $vm.Identity.UserAssignedIdentities.Keys | Should -Contain $identity.Id
-        }        
+            $vmIdentity.UserAssignedIdentities.Keys | Should -Contain $identity.Id
+        }
+    }
+    
+    Context 'Virtual Machine <name> Auto-shutdown' {
+        BeforeAll {
+            [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseDeclaredVarsMoreThanAssignments', '')]
+            $vmScheduleProperties = Get-ScheduleProperties -Definition $Definition -TargetResourceId $vm.Id
+        }
+
+        It 'Validate auto shutdown <propertyName> is <propertyValue>' -TestCases $case_autoShutdown {
+            $vmScheduleProperties.taskType | Should -Be 'ComputeVmShutdownTask'
+            $vmScheduleProperties.$propertyName | Should -Be $propertyValue
+        }
     }
 }
+

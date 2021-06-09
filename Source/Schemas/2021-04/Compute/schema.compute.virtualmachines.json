@@ -18,23 +18,54 @@
                     "type": "string",
                     "description": "(Optional) Resource location"
                 },
-                "vmSize": {
-                    "type": "string",
-                    "description": "(Optional) Specifies the size of the virtual machine."
+                "hardwareProfile": {
+                    "$ref": "#/definitions/hardwareProfile",
+                    "description": "(Optional) Specifies the hardware settings for the virtual machine."
                 },
-                "imageReference": {
-                    "$ref": "#/definitions/imageReference"
+                "storageProfile": {
+                    "$ref": "#/definitions/storageProfile",
+                    "description": "(Optional) Specifies the storage settings for the virtual machine disks."
                 },
                 "networkProfile": {
-                    "$ref": "#/definitions/networkProfile"
+                    "$ref": "#/definitions/networkProfile",
+                    "description": "(Optional) Specifies the network interfaces of the virtual machine."
                 },
-                "userAssignedIdentity": {
-                    "$ref": "#/definitions/userAssignedIdentity"
+                "identity": {
+                    "$ref": "#/definitions/identity",
+                    "description": "(Optional) Identity for the virtual machine."
                 },
                 "autoShutdown": {
-                    "$ref": "#/definitions/autoShutdown"
+                    "$ref": "#/definitions/autoShutdown",
+                    "description": "(Optional) Specifies auto shutdown settings."
                 }
-            }
+            },
+            "additionalProperties": false
+        },
+        "hardwareProfile": {
+            "type": "object",
+            "required": [
+                "vmSize"
+            ],
+            "properties": {
+                "vmSize": {
+                    "type": "string",
+                    "description": "(Required) Specifies the size of the virtual machine."
+                }
+            },
+            "additionalProperties": false
+        },
+        "storageProfile": {
+            "type": "object",
+            "required": [
+                "imageReference"
+            ],
+            "properties": {
+                "imageReference": {
+                    "$ref": "#/definitions/imageReference",
+                    "description": "(Required) Specifies information about the image to use."
+                }
+            },
+            "additionalProperties": false
         },
         "imageReference": {
             "oneOf": [
@@ -62,7 +93,8 @@
                             "type": "string",
                             "description": "(Optional) The name of the Azure context to use to resolve the gallery."
                         }
-                    }
+                    },
+                    "additionalProperties": false
                 },
                 {
                     "type": "object",
@@ -87,52 +119,124 @@
                         },
                         "version": {
                             "type": "string",
-                            "description": "(Required) The image name."
+                            "description": "(Required) The image version."
                         }
-                    }
+                    },
+                    "additionalProperties": false
                 }
-            ],
-            "description": "(Optional) The reference of the OS image."
+            ]
         },
         "networkProfile": {
             "type": "object",
             "required": [
-                "virtualNetwork",
-                "subnet"
+                "networkInterfaces"
             ],
             "properties": {
-                "virtualNetwork": {
-                    "type": "string",
-                    "description": "(Required) The Virtual Network name."
-                },
-                "subnet": {
-                    "type": "string",
-                    "description": "(Required) The Subnet name."
+                "networkInterfaces": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/networkInterface"
+                    },
+                    "description": "(Required) Specifies the list of network interfaces associated with the virtual machine."
                 }
             },
-            "description": "(Optional) The Virtual Machine network profile."
+            "additionalProperties": false
         },
-        "userAssignedIdentity": {
-            "type": "string",
-            "description": "(Optional) The User Assigned Managed Identity name."
+        "networkInterface": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "(Required) The network interface name."
+                },
+                "context": {
+                    "type": "string",
+                    "description": "(Optional) The name of the Azure context to use to resolve the network interface."
+                }
+            },
+            "additionalProperties": false
+        },
+        "identity": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "enum": [
+                                "SystemAssigned",
+                                "UserAssigned",
+                                "SystemAssigned, UserAssigned",
+                                "None"
+                            ],
+                            "description": "(Required) The type of identity used for the virtual machine."
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ]
+                },
+                "userAssignedIdentities": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "name"
+                        ],
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "description": "(Required) The user assigned identity name used for the virtual machine."
+                            },
+                            "context": {
+                                "type": "string",
+                                "description": "(Optional) The name of the Azure context to use to resolve the user assigned managed identity."
+                            }
+                        }
+                    },
+                    "description": "(Optional) Specifies the list of user assigned identities associated with the virtual machine."
+                }
+            },
+            "additionalProperties": false
         },
         "autoShutdown": {
             "type": "object",
             "required": [
-                "dailyRecurrence",
-                "timeZone"
+                "status"
             ],
             "properties": {
+                "status": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "enum": [
+                                "Enabled",
+                                "Disabled"
+                            ],
+                            "description": "(Required) Specifies if auto-shutdown is enabled or disabled."
+                        },
+                        {
+                            "$ref": "../schema.definition.json#/definitions/expression"
+                        }
+                    ]
+                },
                 "dailyRecurrence": {
                     "type": "string",
-                    "description": "(Required) The time of day the schedule will occur."
+                    "description": "(Optional) The time of day the scheduled shutdown will occur."
                 },
-                "timeZone": {
+                "timeZoneId": {
                     "type": "string",
                     "description": "(Required) The time zone ID (e.g. Pacific Standard time)."
                 }
             },
-            "description": "(Optional) The Virtual Machine auto shutdown settings."
+            "description": "(Optional) The Virtual Machine auto shutdown settings.",
+            "additionalProperties": false
         }
     }
 }
