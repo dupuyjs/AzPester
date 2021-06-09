@@ -29,8 +29,8 @@ jobs:
             Find-Module -Name Az | Install-Module -Scope CurrentUser
             Find-Module -Name Pester | Install-Module -Scope CurrentUser
 
-      - name: Generate key vault unique name
-        run: echo KEYVAULT_NAME=kv$(date +%s) >> $GITHUB_ENV
+      - name: Generate temporary password
+        run: echo PASSWORD=azpester$(date +%s)^! >> $GITHUB_ENV
 
       - name: Substitute default parameters (arm template)
         uses: microsoft/variable-substitution@v1
@@ -38,7 +38,7 @@ jobs:
           files: '${{github.workspace}}/Samples/microsoft.compute/vm-simple-windows/arm/azuredeploy.parameters.json'
         env:
           parameters.adminUsername.value: "azpesteradmin"
-          parameters.adminPassword.value: "p@assw0rd^!"
+          parameters.adminPassword.value: ${{env.PASSWORD}}
           parameters.dnsLabelPrefix.value: "azpesterdns"
 
       - name: Substitute default parameters (azpester)
