@@ -1,0 +1,125 @@
+{
+    "$schema": "../../../../Source/Schemas/2021-04/schema.definition.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "type": "string",
+            "defaultValue": "simple-vm"
+        },
+        "vmSize": {
+            "type": "string",
+            "defaultValue": "Standard_D2_v3"
+        },
+        "nicName": {
+            "type": "string",
+            "defaultValue": "myVMNic"
+        },
+        "OSVersion": {
+            "type": "string",
+            "defaultValue": "2019-Datacenter"
+        },
+        "vNet": {
+            "type": "object",
+            "defaultValue": {
+                "name": "MyVNET",
+                "addressPrefix": "10.0.0.0/16",
+                "subnetName": "Subnet",
+                "subnetPrefix": "10.0.0.0/24"
+            }
+        },
+        "nsgName": {
+            "type": "string",
+            "defaultValue": "default-NSG"
+        },
+        "location": {
+            "type": "string"
+        },
+        "subscriptionId": {
+            "type": "string"
+        },
+        "resourceGroupName": {
+            "type": "string"
+        }
+    },
+    "contexts": {
+        "default": {
+            "subscriptionId": "{parameters.subscriptionId}",
+            "resourceGroupName": "{parameters.resourceGroupName}"
+        }
+    },
+    "definition": {
+        "network": {
+            "virtualNetworks": [
+                {
+                    "name": "{parameters.vNet.name}",
+                    "location": "{parameters.location}",
+                    "addressSpace": [
+                        {
+                            "addressPrefix": "{parameters.vNet.addressPrefix}"
+                        }
+                    ],
+                    "subnets": [
+                        {
+                            "name": "{parameters.vNet.subnetName}",
+                            "addressPrefix": "{parameters.vNet.subnetPrefix}",
+                            "networkSecurityGroup": {
+                                "name": "{parameters.nsgName}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "networkSecurityGroups": [
+                {
+                    "name": "{parameters.nsgName}",
+                    "location": "{parameters.location}",
+                    "securityRules": [
+                        {
+                            "name": "default-allow-3389",
+                            "priority": 1000,
+                            "access": "Allow",
+                            "direction": "Inbound",
+                            "destinationPortRange": "3389",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*"
+                        }
+                    ]
+                }
+            ]
+        },
+        "compute": {
+            "virtualMachines": [
+                {
+                    "name": "{parameters.vmName}",
+                    "location": "{parameters.location}",
+                    "hardwareProfile": {
+                        "vmSize": "{parameters.vmSize}"
+                    },
+                    "storageProfile": {
+                        "imageReference": {
+                            "publisher": "MicrosoftWindowsServer",
+                            "offer": "WindowsServer",
+                            "sku": "{parameters.OSVersion}",
+                            "version": "latest"
+                        }
+                    },
+                    "networkProfile": {
+                        "networkInterfaces": [
+                            {
+                                "name": "{parameters.nicName}"
+                            }
+                        ]
+                    },
+                    "identity": {
+                        "type": "None"
+                    },
+                    "autoShutdown": {
+                        "status": "Disabled"
+                    }
+                }
+            ]
+        }
+    }
+}

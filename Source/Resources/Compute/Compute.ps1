@@ -1,4 +1,5 @@
-. $PSScriptRoot/../../Common/Common.ps1
+. $PSScriptRoot/../Common/Common.ps1
+. $PSScriptRoot/../Identity/Identity.ps1
 
 function Get-VirtualMachine {
     param(
@@ -23,7 +24,7 @@ function Get-VirtualMachine {
     Get-AzVM -ResourceGroupName $ResourceGroupName -Name $Name -DefaultProfile $contextObject.Value.Context
 }
 
-function Get-VirtualMachineSubnets {
+function Get-NetworkInterface {
     param(
         [Parameter(Mandatory = $true)]
         [ValidateNotNull()]
@@ -35,8 +36,6 @@ function Get-VirtualMachineSubnets {
         [String] $Context
     )
 
-    $subnets = @()
-
     $contextObject = $Definition.contexts.default
     $ResourceGroupName = $contextObject.ResourceGroupName
 
@@ -45,20 +44,7 @@ function Get-VirtualMachineSubnets {
         $resourceGroupName = $contextObject.ResourceGroupName
     }
 
-    $vm = Get-VirtualMachine -Definition $Definition -Name $Name
-
-    ForEach ($nicReference in $vm.NetworkProfile.NetworkInterfaces) {
-        $nicName = $nicReference.Id.Split('/')[-1]
-        $nic = Get-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Name $nicName -DefaultProfile $contextObject.Value.Context
-
-        ForEach ($ipconfig in $nic.IpConfigurations) {
-            $subnetName = $ipconfig.Subnet.Id.Split('/')[-1]
-            $vNetName = $ipconfig.Subnet.Id.Split('/')[-3]
-            $subnets += @{vnet=$vNetName; subnet=$subnetName}
-        }
-    }
-
-    $subnets
+    Get-AzNetworkInterface -ResourceGroupName $ResourceGroupName -Name $Name -DefaultProfile $contextObject.Value.Context
 }
 
 function Get-GalleryImage {
@@ -92,29 +78,6 @@ function Get-GalleryImage {
         -GalleryImageDefinitionName $ImageName `
         -GalleryImageVersionName $ImageVersion `
         -DefaultProfile $contextObject.Value.Context
-}
-
-function Get-UserAssignedIdentity {
-    param(
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNull()]
-        [PSObject] $Definition,
-        [Parameter(Mandatory = $true)]
-        [ValidateNotNullOrEmpty()]
-        [String] $IdentityName,
-        [Parameter(Mandatory = $false)]
-        [String] $Context
-    )
-
-    $contextObject = $Definition.contexts.default
-    $ResourceGroupName = $contextObject.ResourceGroupName
-    
-    if ($Context) {
-        $contextObject = Get-Context -Definition $Definition -Context $Context
-        $resourceGroupName = $contextObject.ResourceGroupName
-    }
-
-    Get-AzUserAssignedIdentity -ResourceGroupName $resourceGroupName -Name $IdentityName -DefaultProfile $contextObject.Value.Context
 }
 
 function Get-ScheduleProperties {
