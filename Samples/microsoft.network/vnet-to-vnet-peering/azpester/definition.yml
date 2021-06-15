@@ -1,0 +1,60 @@
+$schema: ../../../../Source/Schemas/2021-04/schema.definition.json
+contentVersion: 1.0.0.0
+parameters:
+  vNet1:
+    type: string
+    defaultValue:
+      name: vNet1
+      addressSpacePrefix: 10.0.0.0/24
+      subnetName: subnet1
+      subnetPrefix: 10.0.0.0/24
+  vNet2:
+    type: string
+    defaultValue:
+      name: vNet2
+      addressSpacePrefix: 192.168.0.0/24
+      subnetName: subnet1
+      subnetPrefix: 192.168.0.0/24
+  location:
+    type: string
+  subscriptionId:
+    type: string
+  resourceGroupName:
+    type: string
+contexts:
+  default:
+    subscriptionId: '{parameters.subscriptionId}'
+    resourceGroupName: '{parameters.resourceGroupName}'
+definition:
+  network:
+    virtualNetworks:
+      - name: '{parameters.vNet1.name}'
+        location: '{parameters.location}'
+        addressSpace:
+          - addressPrefix: '{parameters.vNet1.addressSpacePrefix}'
+        subnets:
+          - name: '{parameters.vNet1.subnetName}'
+            addressPrefix: '{parameters.vNet1.subnetPrefix}'
+        virtualNetworkPeerings:
+          - name: '{parameters.vNet1.name}-{parameters.vNet2.name}'
+            allowVirtualNetworkAccess: true
+            allowForwardedTraffic: false
+            allowGatewayTransit: false
+            useRemoteGateways: false
+            remoteVirtualNetwork:
+              name: '{parameters.vNet2.name}'
+      - name: '{parameters.vNet2.name}'
+        location: '{parameters.location}'
+        addressSpace:
+          - addressPrefix: '{parameters.vNet2.addressSpacePrefix}'
+        subnets:
+          - name: '{parameters.vNet2.subnetName}'
+            addressPrefix: '{parameters.vNet2.subnetPrefix}'
+        virtualNetworkPeerings:
+          - name: '{parameters.vNet2.name}-{parameters.vNet1.name}'
+            allowVirtualNetworkAccess: true
+            allowForwardedTraffic: false
+            allowGatewayTransit: false
+            useRemoteGateways: false
+            remoteVirtualNetwork:
+              name: '{parameters.vNet1.name}'
