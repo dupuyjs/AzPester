@@ -11,23 +11,35 @@
         "location": {
             "type": "string"
         },
-        "testResourceGroupName": {
-            "type": "string"
+        "runners": {
+            "type": "object",
+            "defaultValue": {
+                "resourceGroupName": "rg-runners",
+                "location": "westeurope",
+                "cleanup": false
+            }
         },
         "sshPublicKey": {
-            "type": "string"    
+            "type": "string",
+            "defaultValue": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDbz9N4Z1RLefpr/AAKvUjj1d37ExTxBsax0OmOe7wycyUoxpllQjNojhWnVZNejwwglN4YzpZRSrxjHDjZeuJvgIiDoLG0iKOhewCpmiNDbWxGpV/R1RMrgiAP8oeE+TYOvXwFMkWqJpBIqB/5zkit7wPHgd2KQs+47u8GBvPhCgWCWWhr5zw0PaeyhHwpSWlANbCEHKwcroN+hWggwDjnMVkXsOF+ihCUDHEoENtKAzJq0uzrfZRKb2lI2CQTDZBhXCqkYFhJA4bl8UhqN3HgnDfFM8poMRiFDn/XXjxCs556XD77ti0y78VM9XlObfVPf2tK9zwu05xLzWx0urJPcpe9HSwDwSaMFVBzCSVuiRcZNJv/PqrNVTYuyI6LD4LYxPb4quHendil6MjWIm3TeIuSS89uZLJhOyPLYY+A2ZUFIFGWjPiCtJnPukACTGUqr3qiQFI2P+oBRGt7vI/gjHlt66BAe9HqFw6J0gQtEauzVInGDW7+Rg591O2R2lskK6T6OqtSGepBJqCwvBBelyuR0yUt0k6BwnnYDqu2YFeXEszlnyhHj71mvgDLY8IhtLWqdn0hI62q0G5/8OgfayjvUUk7Bfa4HGWmGJPc4RwbAjNWCrOjeibg5YqPGpiOT3vQtr3tRzAOtaqQjdT/Yso9j55putaXrfvtkQMLQw== root@924288ecaefd"    
         },
-        "testVmSku": {
-            "type": "string"
+        "vmSku": {
+            "type": "string",
+            "defaultValue": "Standard_DS1_v2"
         },
-        "vnet": {
-            "type": "string"
+        "vNet1": {
+            "type": "object",
+            "defaultValue": {
+                "name": "vNet1",
+                "subnetName": "subnet1"
+            }
         },
-        "subnet1": {
-            "type": "string"
-        },
-        "subnet2": {
-            "type": "string"
+        "vNet2": {
+            "type": "object",
+            "defaultValue": {
+                "name": "vNet2",
+                "subnetName": "subnet1"
+            }
         }
     },
     "contexts": {
@@ -39,21 +51,21 @@
     "definition": {
         "integration": {
             "testDeploymentInfo": {
-                "location": "{parameters.location}",
-                "resourceGroupName": "{parameters.testResourceGroupName}",
-                "cleanupTestDeployment": true 
+                "location": "{parameters.runners.location}",
+                "resourceGroupName": "{parameters.runners.resourceGroupName}",
+                "cleanup": "{parameters.runners.cleanup}"
             },
             "runners": {
                 "vm1": {
-                    "vnet": "{parameters.vnet}",
-                    "subnet": "{parameters.subnet1}",
-                    "sku": "{parameters.testVmSku}",
+                    "vnet": "{parameters.vNet1.name}",
+                    "subnet": "{parameters.vNet1.subnetName}",
+                    "sku": "{parameters.vmSku}",
                     "sshPublicKey": "{parameters.sshPublicKey}"
                 },
                 "vm2": {
-                    "vnet": "{parameters.vnet}",
-                    "subnet": "{parameters.subnet2}",
-                    "sku": "{parameters.testVmSku}",
+                    "vnet": "{parameters.vNet2.name}",
+                    "subnet": "{parameters.vNet2.subnetName}",
+                    "sku": "{parameters.vmSku}",
                     "sshPublicKey": "{parameters.sshPublicKey}"
                 }
             },
@@ -64,7 +76,7 @@
                     "runFrom": ["vm1", "vm2"]
                 },
                 {
-                    "targetHost": "google.com",
+                    "targetHost": "microsoft.com",
                     "targetPort": 443,
                     "runFrom": ["vm1", "vm2"]
                 }

@@ -48,7 +48,7 @@
 
 - `location`: (Required) The Azure region to use for the deployment of the runners.
 - `resourceGroupName`: (Required) The name of the resource group to use for the deployment of the runners. If the resource group does not exist, it will be created.
-- `cleanupTestDeployment`: (Optional) A flag that indicates that the resource group used for the runners must be cleaned up at the end of the test. Default value is `false`.
+- `cleanup`: (Optional) A flag that indicates that the resource group used for the runners must be cleaned up at the end of the test. Default value is `false`.
 
 > Caution: if you set `true` to `cleanupTestDeployment` the whole resource group `resourceGroupName` will be removed at the end of the test. It is recommended to use a dedicated resource group for the runners and not mix them with any existing infrastructure, to avoid any accidental removal.
 

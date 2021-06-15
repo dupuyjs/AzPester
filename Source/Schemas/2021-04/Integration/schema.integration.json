@@ -19,14 +19,22 @@
                             "type": "string",
                             "description": "(Required) The Azure location where will be created the test runners / infrastructure."
                         },
-                        "cleanupTestDeployment": {
-                            "type": "boolean",
+                        "cleanup": {
+                            "oneOf": [
+                                {
+                                    "type": "boolean"
+                                },
+                                {
+                                    "$ref": "../schema.definition.json#/definitions/expression"
+                                }
+                            ],
                             "description": "(Optional) A flag that indicates if the test infrastructure will be cleaned up after the integration tests."
                         }
                     },
                     "required": [
                         "resourceGroupName",
-                        "location"
+                        "location",
+                        "cleanup"
                     ],
                     "additionalProperties": false
                 },
