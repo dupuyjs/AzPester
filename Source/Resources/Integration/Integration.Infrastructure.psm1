@@ -132,9 +132,9 @@ function Remove-TestInfrastructure {
         throw 'ResourceGroupName input value is Null|Empty or WhiteSpace'
     }
 
-    Write-Information "[#] Removing resource group $ResourceGroupName..."
+    Write-Host "[#] Removing resource group $ResourceGroupName..."
     Remove-AzResourceGroup -Name $ResourceGroupName -Force
-    Write-Information "[#] Resource group $ResourceGroupName has been removed."
+    Write-Host "[#] Resource group $ResourceGroupName has been removed."
 }
 
 function Invoke-CheckResourceAccessCommand {

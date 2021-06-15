@@ -69,7 +69,7 @@ function Get-Json {
 
     if ($FilePath -match '\.yaml$' -or $FilePath -match '\.yml$') {
         $yaml = Get-Content $FilePath -Raw
-        $json = (ConvertFrom-Yaml -Yaml $yaml) | ConvertTo-Json
+        $json = (ConvertFrom-Yaml -Yaml $yaml) | ConvertTo-Json -Depth 100
     }
     else {
         $json = Get-Content $FilePath -Raw

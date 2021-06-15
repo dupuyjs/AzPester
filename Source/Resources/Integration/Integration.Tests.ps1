@@ -20,7 +20,7 @@ Describe 'Integration Tests' -Tag 'Integration' {
 
     AfterAll {
         $TestDeploymentInfo = Find-TestDeploymentInfo -Definition $Definition
-        if ($TestDeploymentInfo.cleanupTestDeployment) {
+        if ($TestDeploymentInfo.cleanup) {
             Remove-TestInfrastructure -TestDeploymentInfo $TestDeploymentInfo
         } else {
             Write-Information "[##] Skipping clean up of test infrastructure."
